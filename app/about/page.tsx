@@ -102,7 +102,7 @@ export default function About() {
                 </div>
                 <div>
                   <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider">Direct Email</p>
-                  <a href="mailto:anova@motorsport.com" className="text-white font-medium hover:text-anova-red transition-colors">anova@motorsport.com</a>
+                  <a href="mailto:anova@anovamotorsport.com" className="text-white font-medium hover:text-anova-red transition-colors">anova@anovamotorsport.com</a>
                 </div>
               </div>
             </div>
