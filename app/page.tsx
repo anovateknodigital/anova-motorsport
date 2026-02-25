@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CountUp from "react-countup";
 import { 
   Instagram, Twitter, Youtube, MapPin, 
@@ -11,6 +11,42 @@ import {
 
 export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [dragRaceTimeLeft, setDragRaceTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [motoprixTimeLeft, setMotoprixTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const dragTargetDate = new Date("2026-04-17T08:00:00+07:00").getTime();
+    const motoprixTargetDate = new Date("2026-05-30T08:00:00+07:00").getTime();
+    
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+
+      // Drag Race Timeline
+      const dragDifference = dragTargetDate - now;
+      if (dragDifference > 0) {
+        setDragRaceTimeLeft({
+          days: Math.floor(dragDifference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((dragDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((dragDifference % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((dragDifference % (1000 * 60)) / 1000),
+        });
+      }
+
+      // Motoprix Timeline
+      const motoDifference = motoprixTargetDate - now;
+      if (motoDifference > 0) {
+        setMotoprixTimeLeft({
+          days: Math.floor(motoDifference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((motoDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((motoDifference % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((motoDifference % (1000 * 60)) / 1000),
+        });
+      }
+
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center">
@@ -44,6 +80,7 @@ export default function Home() {
               Home
               <span className="absolute -bottom-1 left-0 w-full h-[2px] bg-anova-red" />
             </Link>
+            <Link href="/about" className="hover:text-anova-red transition-colors">Tentang Kami</Link>
             <Link href="#events" className="hover:text-anova-red transition-colors">Events</Link>
             <Link href="#results" className="hover:text-anova-red transition-colors">Race Results</Link>
             <Link href="#gallery" className="hover:text-anova-red transition-colors">Gallery</Link>
@@ -75,6 +112,9 @@ export default function Home() {
             <nav className="flex flex-col gap-6 text-xl font-bold border-b border-zinc-100 pb-8 mb-8">
               <Link href="/" className="text-anova-red" onClick={() => setIsMobileMenuOpen(false)}>
                 Home
+              </Link>
+              <Link href="/about" className="hover:text-anova-red transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+                Tentang Kami
               </Link>
               <Link href="#events" className="hover:text-anova-red transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
                 Events
@@ -184,56 +224,143 @@ export default function Home() {
               <span className="h-[2px] w-12 bg-anova-red block"></span>
             </h3>
             
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden backdrop-blur-sm">
-              <div className="relative h-60 w-full group">
-                <Image 
-                  src="https://images.unsplash.com/photo-1625930580053-ec16379a183d?q=80&w=1000&auto=format&fit=crop"
-                  alt="KEJURNAS ANOVA MOTOPRIX Background"
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
-                
-                {/* Track Overlay at Bottom Right */}
-                <div className="absolute -bottom-16 right-4 w-48 h-48 z-20 pointer-events-none">
+            <div className="space-y-10">
+              {/* Event 1: Drag Race (Nearest Event) */}
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden backdrop-blur-sm shadow-xl">
+                <div className="relative h-60 w-full group">
                   <Image 
-                    src="/bangkinang-sirkuit.png"
-                    alt="Sirkuit Bangkinang"
+                    src="https://cdn.medcom.id/dynamic/content/2025/07/13/1768639/X7pS9VTW2A.jpg?w=800"
+                    alt="ANOVA DRAG BIKE"
                     fill
-                    className="object-contain brightness-0 invert opacity-50 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] group-hover:opacity-80 group-hover:scale-105 transition-all duration-500"
+                    className="object-cover"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
+                  <div className="absolute top-4 right-4 bg-anova-red text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider z-10">
+                    Drag Race
+                  </div>
                 </div>
+                
+                <div className="p-8">
+                  <h4 className="text-2xl font-bold text-white mb-4 uppercase">ANOVA DRAG BIKE / DRAG RACE</h4>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-zinc-300">
+                    <div className="flex items-center gap-3">
+                      <Calendar className="text-anova-red shrink-0" size={20} />
+                      <span>17 - 18 April 2026</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Clock className="text-anova-red shrink-0" size={20} />
+                      <span>08:00 - 17:00 WIB</span>
+                    </div>
+                    <div className="flex items-start gap-3 sm:col-span-2">
+                      <MapPin className="text-anova-red shrink-0 mt-0.5" size={20} />
+                      <span>Jalan Lingkar Depan Sport Centre Bangkinang, Kab Kampar, Riau</span>
+                    </div>
+                  </div>
 
-                <div className="absolute top-4 right-4 bg-anova-red text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider z-10">
-                  Motoprix
+                  {/* Countdown Timer */}
+                  <div className="grid grid-cols-4 gap-2 mb-8 bg-black/50 p-4 rounded-lg border border-zinc-800 text-center shadow-inner">
+                    <div className="flex flex-col">
+                      <span className="font-teko text-5xl leading-none font-bold text-white mb-1">{dragRaceTimeLeft.days}</span>
+                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Hari</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-teko text-5xl leading-none font-bold text-white mb-1">{dragRaceTimeLeft.hours}</span>
+                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Jam</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-teko text-5xl leading-none font-bold text-white mb-1">{dragRaceTimeLeft.minutes}</span>
+                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Menit</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-teko text-5xl leading-none font-bold text-anova-red mb-1">{dragRaceTimeLeft.seconds}</span>
+                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Detik</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button className="flex-1 bg-anova-red hover:bg-anova-red-hover text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-colors text-center">
+                      Daftar Online
+                    </button>
+                    <button className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-colors text-center">
+                      Detail & Regulasi
+                    </button>
+                  </div>
                 </div>
               </div>
-              
-              <div className="p-8">
-                <h4 className="text-2xl font-bold text-white mb-4 uppercase">KEJURNAS ANOVA MOTOPRIX</h4>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-zinc-300">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="text-anova-red shrink-0" size={20} />
-                    <span>30-31 Mei 2026</span>
+
+              {/* Event 2: Motoprix */}
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden backdrop-blur-sm">
+                <div className="relative h-60 w-full group">
+                  <Image 
+                    src="https://d34vm3j4h7f97z.cloudfront.net/original/4X/8/7/9/8798a3766550f77660de63c571a51c829cbefd5c.jpeg"
+                    alt="KEJURNAS ANOVA MOTOPRIX Background"
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
+                  
+                  {/* Track Overlay at Bottom Right */}
+                  <div className="absolute -bottom-16 right-4 w-48 h-48 z-20 pointer-events-none">
+                    <Image 
+                      src="/bangkinang-sirkuit.png"
+                      alt="Sirkuit Bangkinang"
+                      fill
+                      className="object-contain brightness-0 invert opacity-50 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] group-hover:opacity-80 group-hover:scale-105 transition-all duration-500"
+                    />
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Clock className="text-anova-red shrink-0" size={20} />
-                    <span>08:00 - 17:00 WIB</span>
-                  </div>
-                  <div className="flex items-start gap-3 sm:col-span-2">
-                    <MapPin className="text-anova-red shrink-0 mt-0.5" size={20} />
-                    <span>Sirkuit Permanent Sport Centre Bangkinang, Kampar</span>
+
+                  <div className="absolute top-4 right-4 bg-anova-red text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider z-10">
+                    Motoprix
                   </div>
                 </div>
+                
+                <div className="p-8">
+                  <h4 className="text-2xl font-bold text-white mb-4 uppercase">KEJURNAS ANOVA MOTOPRIX</h4>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-zinc-300">
+                    <div className="flex items-center gap-3">
+                      <Calendar className="text-anova-red shrink-0" size={20} />
+                      <span>30 - 31 Mei 2026</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Clock className="text-anova-red shrink-0" size={20} />
+                      <span>08:00 - 17:00 WIB</span>
+                    </div>
+                    <div className="flex items-start gap-3 sm:col-span-2">
+                      <MapPin className="text-anova-red shrink-0 mt-0.5" size={20} />
+                      <span>Sirkuit Permanent Sport Centre Bangkinang, Kampar</span>
+                    </div>
+                  </div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <button className="flex-1 bg-anova-red hover:bg-anova-red-hover text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-colors text-center">
-                    Daftar Online
-                  </button>
-                  <button className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-colors text-center">
-                    Detail & Regulasi
-                  </button>
+                  {/* Countdown Timer */}
+                  <div className="grid grid-cols-4 gap-2 mb-8 bg-black/50 p-4 rounded-lg border border-zinc-800 text-center shadow-inner">
+                    <div className="flex flex-col">
+                      <span className="font-teko text-5xl leading-none font-bold text-white mb-1">{motoprixTimeLeft.days}</span>
+                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Hari</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-teko text-5xl leading-none font-bold text-white mb-1">{motoprixTimeLeft.hours}</span>
+                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Jam</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-teko text-5xl leading-none font-bold text-white mb-1">{motoprixTimeLeft.minutes}</span>
+                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Menit</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-teko text-5xl leading-none font-bold text-anova-red mb-1">{motoprixTimeLeft.seconds}</span>
+                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Detik</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button className="flex-1 bg-anova-red hover:bg-anova-red-hover text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-colors text-center">
+                      Daftar Online
+                    </button>
+                    <button className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-colors text-center">
+                      Detail & Regulasi
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
