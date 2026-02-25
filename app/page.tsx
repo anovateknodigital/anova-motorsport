@@ -121,7 +121,7 @@ export default function Home() {
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 text-white">
           <div className="max-w-2xl">
-            <h2 className="font-teko text-4xl md:text-8xl font-bold uppercase italic leading-[0.9] text-white drop-shadow-lg mb-6">
+            <h2 className="font-teko text-5xl md:text-8xl font-bold uppercase italic leading-[0.9] text-white drop-shadow-lg mb-6">
               Garis Finish Adalah
               <br />
               Awal Perjuangan
@@ -185,7 +185,7 @@ export default function Home() {
             </h3>
             
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden backdrop-blur-sm">
-              <div className="relative h-60 w-full group">
+              <div className="relative h-60 w-full group mb-5">
                 <Image 
                   src="https://images.unsplash.com/photo-1625930580053-ec16379a183d?q=80&w=1000&auto=format&fit=crop"
                   alt="KEJURNAS ANOVA MOTOPRIX Background"
@@ -200,7 +200,7 @@ export default function Home() {
                     src="/bangkinang-sirkuit.png"
                     alt="Sirkuit Bangkinang"
                     fill
-                    className="object-contain brightness-0 invert opacity-50 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] group-hover:opacity-80 group-hover:scale-105 transition-all duration-500"
+                    className="object-contain brightness-0 invert opacity-80 md:opacity-50 drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] md:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                   />
                 </div>
 
@@ -366,7 +366,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Main Video Highlight */}
-            <div className="group cursor-pointer relative rounded-2xl overflow-hidden aspect-video border border-zinc-800 bg-zinc-900">
+            <div className="group cursor-pointer relative rounded-2xl overflow-hidden aspect-[4/3] md:aspect-video border border-zinc-800 bg-zinc-900">
               <Image 
                 src="https://images.unsplash.com/photo-1625930545875-b6b0089df67d?q=80&w=1200&auto=format&fit=crop" 
                 alt="Highlight Video" 
@@ -374,16 +374,16 @@ export default function Home() {
                 className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100" 
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-anova-red/90 text-white flex items-center justify-center md:ml-2 pl-1 group-hover:bg-anova-red group-hover:scale-110 transition-all shadow-[0_0_30px_rgba(211,47,47,0.5)]">
-                  <Play size={28} className="text-white" />
+              <div className="absolute inset-0 flex items-center justify-center pb-12 md:pb-0">
+                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-anova-red/90 text-white flex items-center justify-center md:ml-2 pl-1 group-hover:bg-anova-red group-hover:scale-110 transition-all shadow-[0_0_30px_rgba(211,47,47,0.5)]">
+                  <Play className="text-white w-6 h-6 md:w-7 md:h-7" />
                 </div>
               </div>
-              <div className="absolute bottom-6 left-6 right-6">
-                <div className="bg-anova-red text-white text-[10px] font-bold px-2 py-1 rounded inline-block uppercase tracking-wider mb-3">
+              <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6">
+                <div className="bg-anova-red text-white text-[10px] font-bold px-2 py-1 rounded inline-block uppercase tracking-wider mb-2 md:mb-3">
                   Full Race
                 </div>
-                <h4 className="text-2xl font-bold text-white leading-tight">FINAL MOTOPRIX UNDERBONE 150cc - ANOVA CHAMPIONSHIP</h4>
+                <h4 className="text-xl md:text-2xl font-bold text-white leading-tight">FINAL MOTOPRIX UNDERBONE 150cc - ANOVA CHAMPIONSHIP</h4>
               </div>
             </div>
 
@@ -454,7 +454,7 @@ export default function Home() {
       <section className="w-full bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <h4 className="text-center text-sm font-bold text-zinc-400 uppercase tracking-widest mb-8">Official Partners</h4>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-duration-300 transition-all">
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-100 grayscale-0 md:opacity-60 md:grayscale hover:grayscale-0 hover:opacity-100 transition-duration-300 transition-all">
             <Image src="/logo-kny-sponsor.png" alt="KNY Sponsor" width={100} height={40} className="h-12 w-auto object-contain" />
             <Image src="https://sumateracupprix.com/wp-content/uploads/2024/05/image-2024-05-31T135844.401.jpg" alt="Sponsor 1" width={100} height={40} className="h-12 w-auto object-contain" />
             <Image src="https://sumateracupprix.com/wp-content/uploads/2024/05/image-2024-05-31T140333.818.jpg" alt="Sponsor 2" width={100} height={40} className="h-12 w-auto object-contain" />
