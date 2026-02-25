@@ -6,7 +6,7 @@ import { useState } from "react";
 import CountUp from "react-countup";
 import { 
   Instagram, Twitter, Youtube, MapPin, 
-  Calendar, Clock, ShieldCheck, Timer, FileText, Menu, X
+  Calendar, Clock, ShieldCheck, Timer, FileText, Menu, X, Play
 } from "lucide-react";
 
 export default function Home() {
@@ -121,7 +121,7 @@ export default function Home() {
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 text-white">
           <div className="max-w-2xl">
-            <h2 className="font-teko text-6xl md:text-8xl font-bold uppercase italic leading-[0.9] text-white drop-shadow-lg mb-6">
+            <h2 className="font-teko text-4xl md:text-8xl font-bold uppercase italic leading-[0.9] text-white drop-shadow-lg mb-6">
               Garis Finish Adalah
               <br />
               Awal Perjuangan
@@ -185,33 +185,45 @@ export default function Home() {
             </h3>
             
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden backdrop-blur-sm">
-              <div className="relative h-60 w-full">
+              <div className="relative h-60 w-full group">
                 <Image 
                   src="https://images.unsplash.com/photo-1625930580053-ec16379a183d?q=80&w=1000&auto=format&fit=crop"
-                  alt="Anova Drag Championship"
+                  alt="KEJURNAS ANOVA MOTOPRIX Background"
                   fill
                   className="object-cover"
                 />
-                <div className="absolute top-4 right-4 bg-anova-red text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider">
-                  Drag Race
+                <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
+                
+                {/* Track Overlay at Bottom Right */}
+                <div className="absolute -bottom-16 right-4 w-48 h-48 z-20 pointer-events-none">
+                  <Image 
+                    src="/bangkinang-sirkuit.png"
+                    alt="Sirkuit Bangkinang"
+                    fill
+                    className="object-contain brightness-0 invert opacity-50 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] group-hover:opacity-80 group-hover:scale-105 transition-all duration-500"
+                  />
+                </div>
+
+                <div className="absolute top-4 right-4 bg-anova-red text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider z-10">
+                  Motoprix
                 </div>
               </div>
               
               <div className="p-8">
-                <h4 className="text-2xl font-bold text-white mb-4">Anova Drag Championship Round 1</h4>
+                <h4 className="text-2xl font-bold text-white mb-4 uppercase">KEJURNAS ANOVA MOTOPRIX</h4>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-zinc-300">
                   <div className="flex items-center gap-3">
-                    <Calendar className="text-anova-red" size={20} />
-                    <span>28-30 Oktober 2026</span>
+                    <Calendar className="text-anova-red shrink-0" size={20} />
+                    <span>30-31 Mei 2026</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Clock className="text-anova-red" size={20} />
+                    <Clock className="text-anova-red shrink-0" size={20} />
                     <span>08:00 - 17:00 WIB</span>
                   </div>
-                  <div className="flex items-center gap-3 sm:col-span-2">
-                    <MapPin className="text-anova-red" size={20} />
-                    <span>Sirkuit Non Permanen, Jalan Raya Utama</span>
+                  <div className="flex items-start gap-3 sm:col-span-2">
+                    <MapPin className="text-anova-red shrink-0 mt-0.5" size={20} />
+                    <span>Sirkuit Permanent Sport Centre Bangkinang, Kampar</span>
                   </div>
                 </div>
 
@@ -334,6 +346,78 @@ export default function Home() {
 
         </div>
       </div>
+
+      {/* Video Highlights Section */}
+      <section id="video" className="w-full bg-black py-20 border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+            <div>
+              <h3 className="text-3xl font-bold text-white flex items-center gap-3">
+                Latest Race Videos
+              </h3>
+              <p className="text-zinc-400 mt-2 max-w-xl">
+                Tonton ulang highlight pertandingan dan full race dari seri balapan Anova Motorsport terakhir.
+              </p>
+            </div>
+            <Link href="#" className="text-anova-red hover:text-white transition-colors font-bold text-sm uppercase flex items-center gap-2 border border-anova-red hover:border-white px-6 py-2 rounded-full">
+              Kunjungi Channel YouTube <Youtube size={16} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Main Video Highlight */}
+            <div className="group cursor-pointer relative rounded-2xl overflow-hidden aspect-video border border-zinc-800 bg-zinc-900">
+              <Image 
+                src="https://images.unsplash.com/photo-1625930545875-b6b0089df67d?q=80&w=1200&auto=format&fit=crop" 
+                alt="Highlight Video" 
+                fill 
+                className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-anova-red/90 text-white flex items-center justify-center md:ml-2 pl-1 group-hover:bg-anova-red group-hover:scale-110 transition-all shadow-[0_0_30px_rgba(211,47,47,0.5)]">
+                  <Play size={28} className="text-white" />
+                </div>
+              </div>
+              <div className="absolute bottom-6 left-6 right-6">
+                <div className="bg-anova-red text-white text-[10px] font-bold px-2 py-1 rounded inline-block uppercase tracking-wider mb-3">
+                  Full Race
+                </div>
+                <h4 className="text-2xl font-bold text-white leading-tight">FINAL MOTOPRIX UNDERBONE 150cc - ANOVA CHAMPIONSHIP</h4>
+              </div>
+            </div>
+
+            {/* Smaller vids list */}
+            <div className="flex flex-col gap-4">
+              {[
+                { title: "Highlight Drag Race Battle - Bracket 9 Detik", tag: "Highlight", img: "1625930617993-481e41cc7fda" },
+                { title: "Onboard Camera: Lap Rekor Sirkuit oleh Bintang N.", tag: "Onboard", img: "1625930601622-031b9099d4f6" },
+                { title: "Keseruan Paddock & Persiapan Rider Sebelum Start", tag: "Behind The Scene", img: "1625930641163-6c1734ecbd65" }
+              ].map((vid, idx) => (
+                <div key={idx} className="group cursor-pointer flex gap-4 bg-zinc-900/50 hover:bg-zinc-800 p-3 rounded-xl border border-zinc-800/50 transition-colors">
+                  <div className="relative w-40 aspect-video rounded-lg overflow-hidden shrink-0 bg-black">
+                    <Image 
+                      src={`https://images.unsplash.com/photo-${vid.img}?q=80&w=400&auto=format&fit=crop`}
+                      alt={vid.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center pl-0.5 group-hover:bg-anova-red transition-colors">
+                        <Play className="text-white" size={16} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col justify-center py-1">
+                    <span className="text-anova-red text-[10px] font-bold uppercase tracking-wider mb-1">{vid.tag}</span>
+                    <h5 className="font-bold text-zinc-200 group-hover:text-white line-clamp-2 leading-snug text-sm">{vid.title}</h5>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* 8. News & Updates */}
       <section id="news" className="w-full bg-black/50 border-t border-zinc-900 overflow-hidden relative py-20">
