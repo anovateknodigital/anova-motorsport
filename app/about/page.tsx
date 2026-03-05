@@ -1,31 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Instagram, Twitter, Youtube, Mail, ChevronRight, Trophy, Flag, Users } from "lucide-react";
+import { Mail, Trophy, Flag, Users } from "lucide-react";
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
 
 export default function About() {
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white">
-      {/* 1. Header Navigation */}
-      <header className="w-full bg-zinc-950/80 backdrop-blur-md text-white border-b border-zinc-900 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
-          <Link href="/" className="leading-tight shrink-0 flex items-center gap-4 hover:opacity-80 transition-opacity">
-            <Image 
-              src="/anova-motorsport-logo.png"
-              alt="Anova Motorsport Logo"
-              width={160}
-              height={50}
-              className="h-8 md:h-10 w-auto object-contain"
-              priority
-            />
-            <span className="hidden md:flex text-zinc-500 font-bold items-center text-sm uppercase tracking-widest gap-2">
-              <ChevronRight size={16} /> Tentang Kami
-            </span>
-          </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/" className="hover:text-anova-red transition-colors font-medium text-sm uppercase tracking-wider">Kembali ke Beranda</Link>
-          </nav>
-        </div>
-      </header>
+    <>
+      <Header />
+      <div className="min-h-screen flex flex-col bg-black text-white">
 
       {/* 2. Hero About Page */}
       <section className="relative w-full py-24 md:py-32 flex items-center justify-center border-b border-zinc-900 overflow-hidden">
@@ -134,26 +117,8 @@ export default function About() {
         </div>
       </section>
 
-      {/* 5. Footer (Simple variant) */}
-      <footer className="w-full bg-zinc-950 border-t border-zinc-900 pt-16 pb-8 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 text-center flex flex-col items-center justify-center">
-          <Image 
-            src="/anova-motorsport-logo.png"
-            alt="Anova Motorsport Logo"
-            width={150}
-            height={40}
-            className="h-10 md:h-12 w-auto object-contain mb-6"
-          />
-          <div className="flex items-center gap-6 text-zinc-500 mb-8">
-            <a href="#" className="hover:text-white transition-colors"><Instagram size={24} /></a>
-            <a href="#" className="hover:text-white transition-colors"><Twitter size={24} /></a>
-            <a href="#" className="hover:text-white transition-colors"><Youtube size={24} /></a>
-          </div>
-          <p className="text-zinc-600 text-sm font-medium">
-            © 2026 Anova Motorsport. Powered by ANOVA TEKNO DIGITAL
-          </p>
-        </div>
-      </footer>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }

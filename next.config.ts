@@ -19,6 +19,30 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.medcom.id",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.medcom.id",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com", // YouTube thumbnails
+      },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com", // YouTube thumbnails (fallback)
+      },
+      {
+        protocol: "https",
+        hostname: "asset.kompas.com", // YouTube thumbnails (fallback)
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.grid.id", // YouTube thumbnails (fallback)
+      },
     ],
   },
 };

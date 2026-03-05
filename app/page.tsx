@@ -2,417 +2,495 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import CountUp from "react-countup";
-import { 
-  Instagram, Twitter, Youtube, MapPin, 
-  Calendar, Clock, ShieldCheck, Timer, FileText, Menu, X, Play
+import {
+  Instagram, Twitter, Youtube, MapPin,
+  Calendar, Clock, ShieldCheck, Timer, FileText, Menu, X,
 } from "lucide-react";
+import VideoSection from "@/app/components/VideoSection";
+import NewsSection from "@/app/components/NewsSection";
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
 
+// ── Race Start Intro ─────────────────────────────────────────────
+function RaceIntro({ onDone }: { onDone: () => void }) {
+  const [phase, setPhase] = useState(0); // 0 = loading, 1-3 = lights, 4 = GO, 5 = dismiss
+
+  // Simpan onDone di ref agar effect tidak pernah di-re-run akibat referensi callback berubah
+  const onDoneRef = useRef(onDone);
+  useEffect(() => { onDoneRef.current = onDone; });
+
+  useEffect(() => {
+    // Jalankan sequence sekali saja — tidak bergantung pada prop apapun
+    const t0 = setTimeout(() => setPhase(1), 350);
+    const t1 = setTimeout(() => setPhase(2), 750);
+    const t2 = setTimeout(() => setPhase(3), 1150);
+    const t3 = setTimeout(() => setPhase(4), 1650); // GO!
+    const t4 = setTimeout(() => setPhase(5), 2200); // sweep up
+    const t5 = setTimeout(() => {
+      onDoneRef.current();
+    }, 2850);
+    return () => [t0, t1, t2, t3, t4, t5].forEach(clearTimeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // <-- empty: timers tidak pernah dibatalkan oleh re-render parent
+
+  return (
+    <div
+      className="fixed inset-0 z-[999] bg-zinc-950 flex flex-col items-center justify-center overflow-hidden"
+      style={{
+        transform: phase >= 5 ? "translateY(-100%)" : "translateY(0)",
+        transition: "transform 0.65s cubic-bezier(0.76, 0, 0.24, 1)",
+      }}
+    >
+      {/* Speed lines */}
+      {[...Array(14)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute left-0 right-0"
+          style={{
+            top: `${5 + i * 7}%`,
+            height: "1px",
+            background: `linear-gradient(to right, transparent, rgba(211,47,47,${0.08 + (i % 4) * 0.06}), transparent)`,
+            animation: `speedLine ${0.9 + (i % 3) * 0.4}s ease-in-out ${i * 0.06}s infinite`,
+          }}
+        />
+      ))}
+
+      {/* Diagonal red accent */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(135deg, transparent 40%, rgba(211,47,47,0.04) 50%, transparent 60%)",
+        }}
+      />
+
+      {/* Brand Text */}
+      <div
+        className="relative mb-10 text-center"
+        style={{
+          transition: "opacity 0.5s ease, transform 0.5s ease",
+          opacity: phase >= 0 ? 1 : 0,
+          transform: phase >= 0 ? "translateY(0)" : "translateY(16px)",
+        }}
+      >
+        <p className="font-teko text-6xl md:text-7xl font-bold uppercase italic text-white tracking-tight leading-none"
+          style={{ textShadow: "0 0 40px rgba(211,47,47,0.4)" }}
+        >
+          ANOVA
+        </p>
+        <div className="flex items-center gap-3 justify-center mt-1">
+          <div className="h-[2px] w-8 bg-[#D32F2F]" />
+          <p className="font-teko text-2xl md:text-3xl font-bold uppercase tracking-[0.35em] text-[#D32F2F]">
+            MOTORSPORT
+          </p>
+          <div className="h-[2px] w-8 bg-[#D32F2F]" />
+        </div>
+      </div>
+
+      {/* F1 Race lights */}
+      <div className="flex gap-6">
+        {[1, 2, 3].map((light) => {
+          const isOn = phase >= light;
+          return (
+            <div key={light} className="flex flex-col items-center gap-3">
+              {/* Light housing */}
+              <div className="w-4 h-12 rounded bg-zinc-800 flex flex-col justify-around px-0.5 py-1">
+                <div className="h-1.5 w-full rounded-sm bg-zinc-700" />
+                <div className="h-1.5 w-full rounded-sm bg-zinc-700" />
+              </div>
+              {/* Light bulb */}
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: "50%",
+                  border: `2px solid ${isOn ? "#D32F2F" : "#3f3f46"}`,
+                  background: isOn ? "#D32F2F" : "transparent",
+                  boxShadow: isOn
+                    ? "0 0 14px #D32F2F, 0 0 36px rgba(211,47,47,0.5)"
+                    : "none",
+                  transition: "all 0.18s ease",
+                  animation: isOn ? "lightPop 0.3s ease" : "none",
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* GO! */}
+      <div
+        style={{
+          opacity: phase >= 4 ? 1 : 0,
+          transform: phase >= 4 ? "translateY(0)" : "translateY(12px)",
+          transition: "opacity 0.2s ease, transform 0.2s ease",
+        }}
+      >
+        <p
+          className="font-teko text-5xl font-bold text-[#D32F2F] uppercase mt-8 tracking-[0.3em]"
+          style={{ animation: phase >= 4 ? "goFlash 0.35s ease 4" : "none" }}
+        >
+          GO!
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Main Page ────────────────────────────────────────────────────
 export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [dragRaceTimeLeft, setDragRaceTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [motoprixTimeLeft, setMotoprixTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [showIntro, setShowIntro] = useState(false);
+  const [pageReady, setPageReady] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
+  // Countdown timers
   useEffect(() => {
     const dragTargetDate = new Date("2026-04-17T08:00:00+07:00").getTime();
     const motoprixTargetDate = new Date("2026-05-30T08:00:00+07:00").getTime();
-    
+
     const interval = setInterval(() => {
       const now = new Date().getTime();
-
-      // Drag Race Timeline
-      const dragDifference = dragTargetDate - now;
-      if (dragDifference > 0) {
+      const dragDiff = dragTargetDate - now;
+      if (dragDiff > 0) {
         setDragRaceTimeLeft({
-          days: Math.floor(dragDifference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((dragDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((dragDifference % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((dragDifference % (1000 * 60)) / 1000),
+          days: Math.floor(dragDiff / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((dragDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((dragDiff % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((dragDiff % (1000 * 60)) / 1000),
         });
       }
-
-      // Motoprix Timeline
-      const motoDifference = motoprixTargetDate - now;
-      if (motoDifference > 0) {
+      const motoDiff = motoprixTargetDate - now;
+      if (motoDiff > 0) {
         setMotoprixTimeLeft({
-          days: Math.floor(motoDifference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((motoDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((motoDifference % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((motoDifference % (1000 * 60)) / 1000),
+          days: Math.floor(motoDiff / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((motoDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((motoDiff % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((motoDiff % (1000 * 60)) / 1000),
         });
       }
-
     }, 1000);
-
     return () => clearInterval(interval);
+  }, []);
+
+  // Intro selalu tampil setiap halaman dikunjungi
+  useEffect(() => {
+    setShowIntro(true);
+  }, []);
+
+  // Scroll progress bar
+  useEffect(() => {
+    const onScroll = () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      if (total > 0) setScrollProgress((window.scrollY / total) * 100);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // IntersectionObserver — scroll reveal
+  useEffect(() => {
+    if (!pageReady) return;
+    const observer = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) e.target.classList.add("is-visible");
+        }),
+      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
+    );
+    document
+      .querySelectorAll("[data-reveal]")
+      .forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [pageReady]);
+
+  // useCallback agar referensi stabil — tidak memicu re-run effect di RaceIntro
+  const handleIntroDone = useCallback(() => {
+    setShowIntro(false);
+    setPageReady(true);
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center">
-      {/* 1. Header (Navigation & Branding) */}
-      <header className="w-full bg-white text-zinc-900 border-b border-zinc-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="leading-tight shrink-0">
-              <Image 
-                src="/anova-motorsport-logo.png"
-                alt="Anova Motorsport Logo"
-                width={200}
-                height={60}
-                className="h-10 md:h-12 w-auto object-contain"
-                priority
-              />
-            </Link>
-            <div className="h-10 md:h-12 w-10 md:w-12 relative flex-shrink-0">
-              <Image 
-                src="/imi-logo.webp"
-                alt="IMI Logo"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-          </div>
+      {/* Race Start Intro — fullscreen, di atas segalanya */}
+      {showIntro && <RaceIntro onDone={handleIntroDone} />}
 
-          <nav className="hidden md:flex items-center gap-8 font-medium text-sm">
-            <Link href="/" className="text-anova-red relative font-bold">
-              Home
-              <span className="absolute -bottom-1 left-0 w-full h-[2px] bg-anova-red" />
-            </Link>
-            <Link href="/about" className="hover:text-anova-red transition-colors">Tentang Kami</Link>
-            <Link href="#events" className="hover:text-anova-red transition-colors">Events</Link>
-            <Link href="#results" className="hover:text-anova-red transition-colors">Race Results</Link>
-            <Link href="#gallery" className="hover:text-anova-red transition-colors">Gallery</Link>
-            <Link href="#news" className="hover:text-anova-red transition-colors">News</Link>
-          </nav>
+      {/* Saat intro masih berjalan: tampilkan layar hitam penuh agar konten tidak bocor */}
+      {!pageReady && !showIntro && (
+        <div className="fixed inset-0 bg-zinc-950 z-[998]" />
+      )}
 
-          <div className="hidden md:flex items-center gap-6">
-            <button className="bg-anova-red hover:bg-anova-red-hover text-white px-6 py-2.5 rounded font-bold uppercase tracking-wide text-sm transition-colors">
-              Daftar Event Sekarang
-            </button>
-            <div className="flex items-center gap-4 text-zinc-600">
-              <Link href="#" className="hover:text-anova-red transition-colors"><Instagram size={18} /></Link>
-              <Link href="#" className="hover:text-anova-red transition-colors"><Twitter size={18} /></Link>
-              <Link href="#" className="hover:text-anova-red transition-colors"><Youtube size={18} /></Link>
-            </div>
-          </div>
-
-          <button 
-            className="md:hidden text-zinc-900 border-none bg-transparent"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
+      {/* Scroll Progress Bar — selalu ada agar tidak merusak layout */}
+      {pageReady && (
+        <div className="fixed top-0 left-0 right-0 h-[3px] bg-zinc-900/80 z-[100] pointer-events-none">
+          <div
+            className="h-full bg-gradient-to-r from-[#D32F2F] via-[#ff5252] to-[#D32F2F]"
+            style={{
+              width: `${scrollProgress}%`,
+              transition: "width 60ms linear",
+              boxShadow: scrollProgress > 2 ? "0 0 8px rgba(211,47,47,0.7)" : "none",
+            }}
+          />
         </div>
+      )}
 
-        {/* Mobile Navigation Drawer */}
-        {isMobileMenuOpen && (
-          <div className="absolute top-20 left-0 w-full h-[calc(100vh-80px)] bg-white z-40 md:hidden flex flex-col px-6 py-8 overflow-y-auto shadow-xl">
-            <nav className="flex flex-col gap-6 text-xl font-bold border-b border-zinc-100 pb-8 mb-8">
-              <Link href="/" className="text-anova-red" onClick={() => setIsMobileMenuOpen(false)}>
-                Home
-              </Link>
-              <Link href="/about" className="hover:text-anova-red transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                Tentang Kami
-              </Link>
-              <Link href="#events" className="hover:text-anova-red transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                Events
-              </Link>
-              <Link href="#results" className="hover:text-anova-red transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                Race Results
-              </Link>
-              <Link href="#gallery" className="hover:text-anova-red transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                Gallery
-              </Link>
-              <Link href="#news" className="hover:text-anova-red transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                News
-              </Link>
-            </nav>
-            
-            <div className="flex flex-col gap-6 mt-auto">
-              <button className="bg-anova-red hover:bg-anova-red-hover text-white px-6 py-4 rounded font-bold uppercase tracking-wide text-sm transition-colors w-full">
-                Daftar Event Sekarang
-              </button>
-              <div className="flex items-center justify-center gap-8 text-zinc-600">
-                <Link href="#" className="hover:text-anova-red transition-colors"><Instagram size={24} /></Link>
-                <Link href="#" className="hover:text-anova-red transition-colors"><Twitter size={24} /></Link>
-                <Link href="#" className="hover:text-anova-red transition-colors"><Youtube size={24} /></Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
+      {/* ── Konten Utama: hanya dirender setelah intro selesai ── */}
+      {pageReady && (
+        <div
+          className="w-full flex flex-col items-center"
+          style={{ animation: "fadeInPage 0.6s cubic-bezier(0.16, 1, 0.3, 1) both" }}
+        >
+
+      <Header />
 
       {/* 2. Hero Section */}
-      <section className="relative w-full h-[80vh] min-h-[600px] flex items-center justify-center">
-        {/* Background Image */}
+      <section className="relative w-full h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <Image 
+          <Image
             src="https://images.unsplash.com/photo-1613246273006-7f7476e693d9?q=80&w=2670&auto=format&fit=crop"
             alt="Motoprix Action"
             fill
-            className="object-cover"
+            className="object-cover scale-105"
+            style={{ animation: "heroZoom 12s ease-in-out infinite alternate" }}
             priority
           />
-          {/* Dark Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
+
+          {/* Diagonal speed stripe */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: "linear-gradient(105deg, transparent 30%, rgba(211,47,47,0.06) 50%, transparent 70%)",
+            }}
+          />
         </div>
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 text-white">
           <div className="max-w-2xl">
-            <h2 className="font-teko text-5xl md:text-8xl font-bold uppercase italic leading-[0.9] text-white drop-shadow-lg mb-6">
+            {/* Animated red badge */}
+            <div
+              data-reveal="left"
+              className="inline-flex items-center gap-2 bg-[#D32F2F]/20 border border-[#D32F2F]/40 text-[#D32F2F] text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-5"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D32F2F] animate-pulse" />
+              Penyelenggara Resmi IMI
+            </div>
+
+            <h2
+              data-reveal="left"
+              data-delay="1"
+              className="font-teko text-5xl md:text-8xl font-bold uppercase italic leading-[0.9] text-white drop-shadow-lg mb-6"
+            >
               Garis Finish Adalah
               <br />
               Awal Perjuangan
             </h2>
-            <p className="text-lg md:text-xl text-zinc-200 mb-10 max-w-xl leading-relaxed">
+
+            <p
+              data-reveal="left"
+              data-delay="2"
+              className="text-lg md:text-xl text-zinc-200 mb-10 max-w-xl leading-relaxed"
+            >
               Penyelenggara event balap resmi di bawah naungan IMI. Bergabunglah dengan ratusan pembalap lainnya.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-anova-red hover:bg-anova-red-hover text-white px-8 py-3.5 rounded font-bold uppercase tracking-wider text-sm transition-colors text-center shadow-red-500/20 shadow-xl">
+
+            <div data-reveal="left" data-delay="3" className="flex flex-col sm:flex-row gap-4">
+              <button className="bg-anova-red hover:bg-anova-red-hover text-white px-8 py-3.5 rounded font-bold uppercase tracking-wider text-sm transition-all text-center shadow-red-500/20 shadow-xl hover:scale-105 active:scale-95">
                 Daftar Event Sekarang
               </button>
-              <button className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-8 py-3.5 rounded font-bold uppercase tracking-wider text-sm transition-colors text-center">
+              <button className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-8 py-3.5 rounded font-bold uppercase tracking-wider text-sm transition-all text-center hover:scale-105 active:scale-95">
                 Lihat Hasil Balap Terakhir
               </button>
             </div>
           </div>
         </div>
+
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#09090b] to-transparent" />
       </section>
 
       {/* 3. Quick Stats */}
       <div className="w-full bg-black border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 flex flex-wrap justify-between gap-8 text-center sm:text-left">
-          <div className="flex flex-col flex-1 min-w-[150px] items-center">
-            <span className="font-teko text-5xl font-bold text-white mb-1">
-              <CountUp end={50} suffix="+" enableScrollSpy scrollSpyOnce />
-            </span>
-            <span className="text-zinc-400 text-sm uppercase tracking-wider font-semibold">Event Terlaksana</span>
-          </div>
-          <div className="flex flex-col flex-1 min-w-[150px] items-center">
-            <span className="font-teko text-5xl font-bold text-white mb-1">
-              <CountUp end={1000} suffix="+" enableScrollSpy scrollSpyOnce separator="," />
-            </span>
-            <span className="text-zinc-400 text-sm uppercase tracking-wider font-semibold">Pembalap Terdaftar</span>
-          </div>
-          <div className="flex flex-col flex-1 min-w-[150px] items-center">
-            <span className="font-teko text-5xl font-bold text-white mb-1">
-              <CountUp end={20} suffix="+" enableScrollSpy scrollSpyOnce />
-            </span>
-            <span className="text-zinc-400 text-sm uppercase tracking-wider font-semibold">Kategori Kelas</span>
-          </div>
-          <div className="flex flex-col flex-1 min-w-[150px] items-center">
-            <span className="font-teko text-5xl font-bold text-white mb-1">
-              <CountUp end={10} enableScrollSpy scrollSpyOnce />
-            </span>
-            <span className="text-zinc-400 text-sm uppercase tracking-wider font-semibold">Tahun Pengalaman</span>
-          </div>
+          {[
+            { end: 50, suffix: "+", label: "Event Terlaksana" },
+            { end: 1000, suffix: "+", label: "Pembalap Terdaftar", separator: "," },
+            { end: 20, suffix: "+", label: "Kategori Kelas" },
+            { end: 10, suffix: "", label: "Tahun Pengalaman" },
+          ].map(({ end, suffix, label, separator }, i) => (
+            <div
+              key={label}
+              data-reveal
+              data-delay={String(i + 1)}
+              className="flex flex-col flex-1 min-w-[150px] items-center"
+            >
+              <span className="font-teko text-5xl font-bold text-white mb-1">
+                <CountUp end={end} suffix={suffix} enableScrollSpy scrollSpyOnce separator={separator ?? ""} />
+              </span>
+              <span className="text-zinc-400 text-sm uppercase tracking-wider font-semibold">{label}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Main Grid: Left & Right Columns */}
+      {/* Main Grid */}
       <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-20 grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12 lg:gap-20">
-        
+
         {/* LEFT COLUMN */}
         <div className="space-y-20">
-          
+
           {/* 4. Upcoming Events */}
           <section id="events" className="scroll-mt-32">
-            <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+            <h3
+              data-reveal="left"
+              className="text-2xl font-bold text-white mb-8 flex items-center gap-3"
+            >
               Upcoming Events
-              <span className="h-[2px] w-12 bg-anova-red block"></span>
+              <span className="h-[2px] w-12 bg-anova-red block" />
             </h3>
-            
+
             <div className="space-y-10">
-              {/* Event 1: Drag Race (Nearest Event) */}
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden backdrop-blur-sm shadow-xl">
+              {/* Event 1: Drag Race */}
+              <div
+                data-reveal
+                className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden backdrop-blur-sm shadow-xl hover:border-[#D32F2F]/30 transition-all duration-300 hover:shadow-[0_0_30px_rgba(211,47,47,0.08)]"
+              >
                 <div className="relative h-60 w-full group">
-                  <Image 
+                  <Image
                     src="https://cdn.medcom.id/dynamic/content/2025/07/13/1768639/X7pS9VTW2A.jpg?w=800"
                     alt="ANOVA DRAG BIKE"
                     fill
-                    className="object-cover"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
                   <div className="absolute top-4 right-4 bg-anova-red text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider z-10">
                     Drag Race
                   </div>
                 </div>
-                
+
                 <div className="p-8">
                   <h4 className="text-2xl font-bold text-white mb-4 uppercase">ANOVA DRAG BIKE / DRAG RACE</h4>
-                  
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-zinc-300">
-                    <div className="flex items-center gap-3">
-                      <Calendar className="text-anova-red shrink-0" size={20} />
-                      <span>17 - 18 April 2026</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Clock className="text-anova-red shrink-0" size={20} />
-                      <span>08:00 - 17:00 WIB</span>
-                    </div>
-                    <div className="flex items-start gap-3 sm:col-span-2">
-                      <MapPin className="text-anova-red shrink-0 mt-0.5" size={20} />
-                      <span>Jalan Lingkar Depan Sport Centre Bangkinang, Kab Kampar, Riau</span>
-                    </div>
+                    <div className="flex items-center gap-3"><Calendar className="text-anova-red shrink-0" size={20} /><span>17 - 18 April 2026</span></div>
+                    <div className="flex items-center gap-3"><Clock className="text-anova-red shrink-0" size={20} /><span>08:00 - 17:00 WIB</span></div>
+                    <div className="flex items-start gap-3 sm:col-span-2"><MapPin className="text-anova-red shrink-0 mt-0.5" size={20} /><span>Jalan Lingkar Depan Sport Centre Bangkinang, Kab Kampar, Riau</span></div>
                   </div>
-
-                  {/* Countdown Timer */}
                   <div className="grid grid-cols-4 gap-2 mb-8 bg-black/50 p-4 rounded-lg border border-zinc-800 text-center shadow-inner">
-                    <div className="flex flex-col">
-                      <span className="font-teko text-5xl leading-none font-bold text-white mb-1">{dragRaceTimeLeft.days}</span>
-                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Hari</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-teko text-5xl leading-none font-bold text-white mb-1">{dragRaceTimeLeft.hours}</span>
-                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Jam</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-teko text-5xl leading-none font-bold text-white mb-1">{dragRaceTimeLeft.minutes}</span>
-                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Menit</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-teko text-5xl leading-none font-bold text-anova-red mb-1">{dragRaceTimeLeft.seconds}</span>
-                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Detik</span>
-                    </div>
+                    {[
+                      { val: dragRaceTimeLeft.days, label: "Hari" },
+                      { val: dragRaceTimeLeft.hours, label: "Jam" },
+                      { val: dragRaceTimeLeft.minutes, label: "Menit" },
+                      { val: dragRaceTimeLeft.seconds, label: "Detik", red: true },
+                    ].map(({ val, label, red }) => (
+                      <div key={label} className="flex flex-col">
+                        <span className={`font-teko text-5xl leading-none font-bold mb-1 ${red ? "text-anova-red" : "text-white"}`}>{val}</span>
+                        <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">{label}</span>
+                      </div>
+                    ))}
                   </div>
-
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <button className="flex-1 bg-anova-red hover:bg-anova-red-hover text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-colors text-center">
-                      Daftar Online
-                    </button>
-                    <button className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-colors text-center">
-                      Detail & Regulasi
-                    </button>
+                    <button className="flex-1 bg-anova-red hover:bg-anova-red-hover text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-all hover:scale-[1.02] active:scale-95 text-center">Daftar Online</button>
+                    <button className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-all hover:scale-[1.02] active:scale-95 text-center">Detail &amp; Regulasi</button>
                   </div>
                 </div>
               </div>
 
               {/* Event 2: Motoprix */}
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden backdrop-blur-sm">
+              <div
+                data-reveal
+                data-delay="1"
+                className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden backdrop-blur-sm hover:border-[#D32F2F]/30 transition-all duration-300 hover:shadow-[0_0_30px_rgba(211,47,47,0.08)]"
+              >
                 <div className="relative h-60 w-full group mb-5">
-                  <Image 
+                  <Image
                     src="https://d34vm3j4h7f97z.cloudfront.net/original/4X/8/7/9/8798a3766550f77660de63c571a51c829cbefd5c.jpeg"
-                    alt="KEJURNAS ANOVA MOTOPRIX Background"
+                    alt="KEJURNAS ANOVA MOTOPRIX"
                     fill
-                    className="object-cover"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
-                  
-                  {/* Track Overlay at Bottom Right */}
                   <div className="absolute -bottom-16 right-4 w-48 h-48 z-20 pointer-events-none">
-                    <Image 
+                    <Image
                       src="/bangkinang-sirkuit.png"
                       alt="Sirkuit Bangkinang"
                       fill
-                      className="object-contain brightness-0 invert opacity-80 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] group-hover:opacity-80 group-hover:scale-105 transition-all duration-500"
+                      className="object-contain brightness-0 invert opacity-80 group-hover:scale-105 transition-all duration-500"
                     />
                   </div>
-
-                  <div className="absolute top-4 right-4 bg-anova-red text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider z-10">
-                    Motoprix
-                  </div>
+                  <div className="absolute top-4 right-4 bg-anova-red text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider z-10">Motoprix</div>
                 </div>
-                
+
                 <div className="p-8">
                   <h4 className="text-2xl font-bold text-white mb-4 uppercase">KEJURNAS ANOVA MOTOPRIX</h4>
-                  
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-zinc-300">
-                    <div className="flex items-center gap-3">
-                      <Calendar className="text-anova-red shrink-0" size={20} />
-                      <span>30 - 31 Mei 2026</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Clock className="text-anova-red shrink-0" size={20} />
-                      <span>08:00 - 17:00 WIB</span>
-                    </div>
-                    <div className="flex items-start gap-3 sm:col-span-2">
-                      <MapPin className="text-anova-red shrink-0 mt-0.5" size={20} />
-                      <span>Sirkuit Permanent Sport Centre Bangkinang, Kampar</span>
-                    </div>
+                    <div className="flex items-center gap-3"><Calendar className="text-anova-red shrink-0" size={20} /><span>30 - 31 Mei 2026</span></div>
+                    <div className="flex items-center gap-3"><Clock className="text-anova-red shrink-0" size={20} /><span>08:00 - 17:00 WIB</span></div>
+                    <div className="flex items-start gap-3 sm:col-span-2"><MapPin className="text-anova-red shrink-0 mt-0.5" size={20} /><span>Sirkuit Permanent Sport Centre Bangkinang, Kampar</span></div>
                   </div>
-
-                  {/* Countdown Timer */}
                   <div className="grid grid-cols-4 gap-2 mb-8 bg-black/50 p-4 rounded-lg border border-zinc-800 text-center shadow-inner">
-                    <div className="flex flex-col">
-                      <span className="font-teko text-5xl leading-none font-bold text-white mb-1">{motoprixTimeLeft.days}</span>
-                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Hari</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-teko text-5xl leading-none font-bold text-white mb-1">{motoprixTimeLeft.hours}</span>
-                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Jam</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-teko text-5xl leading-none font-bold text-white mb-1">{motoprixTimeLeft.minutes}</span>
-                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Menit</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-teko text-5xl leading-none font-bold text-anova-red mb-1">{motoprixTimeLeft.seconds}</span>
-                      <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Detik</span>
-                    </div>
+                    {[
+                      { val: motoprixTimeLeft.days, label: "Hari" },
+                      { val: motoprixTimeLeft.hours, label: "Jam" },
+                      { val: motoprixTimeLeft.minutes, label: "Menit" },
+                      { val: motoprixTimeLeft.seconds, label: "Detik", red: true },
+                    ].map(({ val, label, red }) => (
+                      <div key={label} className="flex flex-col">
+                        <span className={`font-teko text-5xl leading-none font-bold mb-1 ${red ? "text-anova-red" : "text-white"}`}>{val}</span>
+                        <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">{label}</span>
+                      </div>
+                    ))}
                   </div>
-
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <button className="flex-1 bg-anova-red hover:bg-anova-red-hover text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-colors text-center">
-                      Daftar Online
-                    </button>
-                    <button className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-colors text-center">
-                      Detail & Regulasi
-                    </button>
+                    <button className="flex-1 bg-anova-red hover:bg-anova-red-hover text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-all hover:scale-[1.02] active:scale-95 text-center">Daftar Online</button>
+                    <button className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-all hover:scale-[1.02] active:scale-95 text-center">Detail &amp; Regulasi</button>
                   </div>
                 </div>
               </div>
             </div>
           </section>
 
-          {/* 6. Features/Why Join Us? */}
+          {/* 6. Why Join Us? */}
           <section>
-            <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+            <h3 data-reveal="left" className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
               Why Join Us?
             </h3>
             <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center shrink-0 text-anova-red">
-                  <Timer size={24} />
+              {[
+                { icon: Timer, title: "Sistem Timing Akurat", desc: "Menggunakan sensor transponder standar nasional untuk presisi hingga persekian detik." },
+                { icon: ShieldCheck, title: "Regulasi IMI Resmi", desc: "Event resmi, aman, dan perolehan poin diakui untuk kejuaraan tingkat nasional." },
+                { icon: FileText, title: "Scrutineering Ketat", desc: "Sistem pemeriksaan ketat yang menjamin kompetisi yang adil bagi semua peserta dari berbagai kelas." },
+              ].map(({ icon: Icon, title, desc }, i) => (
+                <div
+                  key={title}
+                  data-reveal="left"
+                  data-delay={String(i + 1)}
+                  className="flex items-start gap-4 group"
+                >
+                  <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center shrink-0 text-anova-red group-hover:bg-[#D32F2F]/10 group-hover:border-[#D32F2F]/30 transition-all">
+                    <Icon size={24} />
+                  </div>
+                  <div>
+                    <h4 className="text-white font-bold mb-1">{title}</h4>
+                    <p className="text-zinc-400 text-sm">{desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-white font-bold mb-1">Sistem Timing Akurat</h4>
-                  <p className="text-zinc-400 text-sm">Menggunakan sensor transponder standar nasional untuk presisi hingga persekian detik.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center shrink-0 text-anova-red">
-                  <ShieldCheck size={24} />
-                </div>
-                <div>
-                  <h4 className="text-white font-bold mb-1">Regulasi IMI Resmi</h4>
-                  <p className="text-zinc-400 text-sm">Event resmi, aman, dan perolehan poin diakui untuk kejuaraan tingkat nasional.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center shrink-0 text-anova-red">
-                  <FileText size={24} />
-                </div>
-                <div>
-                  <h4 className="text-white font-bold mb-1">Scrutineering Ketat</h4>
-                  <p className="text-zinc-400 text-sm">Sistem pemeriksaan ketat yang menjamin kompetisi yang adil bagi semua peserta dari berbagai kelas.</p>
-                </div>
-              </div>
+              ))}
             </div>
           </section>
-
         </div>
 
         {/* RIGHT COLUMN */}
         <div className="space-y-20">
-          
-          {/* 5. Latest Race Results */}
+
+          {/* 5. Race Results */}
           <section id="results">
-            <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+            <h3 data-reveal="right" className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
               Latest Race Results
             </h3>
-            <div className="bg-white rounded-xl overflow-hidden text-zinc-900">
+            <div data-reveal="scale" className="bg-white rounded-xl overflow-hidden text-zinc-900">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-zinc-100 uppercase text-xs tracking-wider text-zinc-500 font-bold border-b border-zinc-200">
@@ -421,31 +499,37 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody className="text-sm font-medium">
-                  <tr className="border-b border-zinc-100">
-                    <td className="py-4 px-6">
-                      <div className="font-bold">Motoprix</div>
-                      <div className="text-xs text-zinc-500 font-normal">Underbone 150cc</div>
-                    </td>
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50 transition-colors">
+                    <td className="py-4 px-6"><div className="font-bold">Motoprix</div><div className="text-xs text-zinc-500 font-normal">Underbone 150cc</div></td>
                     <td className="py-4 px-6 text-right">
-                      <div className="font-bold">Bintang N.</div>
-                      <div className="text-xs text-zinc-500 font-normal">Anova RT</div>
+                      <div className="flex items-center justify-end gap-3">
+                        <div className="text-right">
+                          <div className="font-bold">Bintang N.</div>
+                          <div className="text-xs text-zinc-500 font-normal">Anova RT</div>
+                        </div>
+                        <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-zinc-200 shrink-0">
+                          <Image src="https://asset.kompas.com/crops/_WPT6_jc87U-nz1_jNlkjTcx2Dg=/0x0:1599x1066/750x500/data/photo/2024/11/17/673a0716d9b2b.jpeg" alt="Bintang N." fill className="object-cover" />
+                        </div>
+                      </div>
                     </td>
                   </tr>
-                  <tr className="border-b border-zinc-100 bg-zinc-50/50">
-                    <td className="py-4 px-6">
-                      <div className="font-bold">Drag Race</div>
-                      <div className="text-xs text-zinc-500 font-normal">Bracket 9 Detik</div>
-                    </td>
+                  <tr className="border-b border-zinc-100 bg-zinc-50/50 hover:bg-zinc-50 transition-colors">
+                    <td className="py-4 px-6"><div className="font-bold">Drag Race</div><div className="text-xs text-zinc-500 font-normal">Bracket 9 Detik</div></td>
                     <td className="py-4 px-6 text-right">
-                      <div className="font-bold">Reza V.</div>
-                      <div className="text-xs text-anova-red font-bold">09.012s</div>
+                      <div className="flex items-center justify-end gap-3">
+                        <div className="text-right">
+                          <div className="font-bold">Reza V.</div>
+                          <div className="text-xs text-anova-red font-bold">09.012s</div>
+                        </div>
+                        <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-zinc-200 shrink-0">
+                          <Image src="https://cdn.grid.id/crop/0x0:0x0/700x465/photo/2020/09/28/4272447586.jpg" alt="Reza V." fill className="object-cover" />
+                        </div>
+                      </div>
                     </td>
                   </tr>
                   <tr>
                     <td colSpan={2} className="py-4 px-6 text-center">
-                      <Link href="#results" className="text-anova-red hover:underline font-bold text-sm">
-                        Lihat Semua Hasil
-                      </Link>
+                      <Link href="#results" className="text-anova-red hover:underline font-bold text-sm">Lihat Semua Hasil</Link>
                     </td>
                   </tr>
                 </tbody>
@@ -453,195 +537,77 @@ export default function Home() {
             </div>
           </section>
 
-          {/* 7. Media Gallery */}
+          {/* 7. Gallery */}
           <section id="gallery">
-            <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+            <h3 data-reveal="right" className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
               Media Gallery
             </h3>
             <div className="grid grid-cols-2 gap-4">
-              <div className="relative h-48 rounded-lg overflow-hidden col-span-2">
-                <Image src="https://images.unsplash.com/photo-1625930617993-481e41cc7fda?q=80&w=800&auto=format&fit=crop" alt="Paddock" fill className="object-cover" />
+              <div data-reveal="scale" className="relative h-48 rounded-lg overflow-hidden col-span-2 group">
+                <Image src="https://images.unsplash.com/photo-1625930617993-481e41cc7fda?q=80&w=800&auto=format&fit=crop" alt="Paddock" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
               </div>
-              <div className="relative h-32 rounded-lg overflow-hidden">
-                <Image src="https://images.unsplash.com/photo-1625930601622-031b9099d4f6?q=80&w=600&auto=format&fit=crop" alt="Motor" fill className="object-cover" />
+              <div data-reveal data-delay="1" className="relative h-32 rounded-lg overflow-hidden group">
+                <Image src="https://images.unsplash.com/photo-1625930601622-031b9099d4f6?q=80&w=600&auto=format&fit=crop" alt="Motor" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
               </div>
-              <div className="relative h-32 rounded-lg overflow-hidden">
-                <Image src="https://images.unsplash.com/photo-1625930545875-b6b0089df67d?q=80&w=600&auto=format&fit=crop" alt="Action" fill className="object-cover" />
+              <div data-reveal data-delay="2" className="relative h-32 rounded-lg overflow-hidden group">
+                <Image src="https://images.unsplash.com/photo-1625930545875-b6b0089df67d?q=80&w=600&auto=format&fit=crop" alt="Action" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
               </div>
             </div>
           </section>
-
         </div>
       </div>
 
-      {/* Video Highlights Section */}
-      <section id="video" className="w-full bg-black py-20 border-t border-zinc-900">
+      <VideoSection />
+
+      <NewsSection />
+
+      {/* Partners */}
+      <section data-reveal className="w-full bg-white py-12 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-            <div>
-              <h3 className="text-3xl font-bold text-white flex items-center gap-3">
-                Latest Race Videos
-              </h3>
-              <p className="text-zinc-400 mt-2 max-w-xl">
-                Tonton ulang highlight pertandingan dan full race dari seri balapan Anova Motorsport terakhir.
-              </p>
-            </div>
-            <Link href="#" className="text-anova-red hover:text-white transition-colors font-bold text-sm uppercase flex items-center gap-2 border border-anova-red hover:border-white px-6 py-2 rounded-full">
-              Kunjungi Channel YouTube <Youtube size={16} />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Main Video Highlight */}
-            <div className="group cursor-pointer relative rounded-2xl overflow-hidden aspect-[4/3] md:aspect-video border border-zinc-800 bg-zinc-900">
-              <Image 
-                src="https://images.unsplash.com/photo-1625930545875-b6b0089df67d?q=80&w=1200&auto=format&fit=crop" 
-                alt="Highlight Video" 
-                fill 
-                className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100" 
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-              <div className="absolute inset-0 flex items-center justify-center pb-12 md:pb-0">
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-anova-red/90 text-white flex items-center justify-center md:ml-2 pl-1 group-hover:bg-anova-red group-hover:scale-110 transition-all shadow-[0_0_30px_rgba(211,47,47,0.5)]">
-                  <Play className="text-white w-6 h-6 md:w-7 md:h-7" />
-                </div>
-              </div>
-              <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6">
-                <div className="bg-anova-red text-white text-[10px] font-bold px-2 py-1 rounded inline-block uppercase tracking-wider mb-2 md:mb-3">
-                  Full Race
-                </div>
-                <h4 className="text-xl md:text-2xl font-bold text-white leading-tight">FINAL MOTOPRIX UNDERBONE 150cc - ANOVA CHAMPIONSHIP</h4>
-              </div>
-            </div>
-
-            {/* Smaller vids list */}
-            <div className="flex flex-col gap-4">
-              {[
-                { title: "Highlight Drag Race Battle - Bracket 9 Detik", tag: "Highlight", img: "1625930617993-481e41cc7fda" },
-                { title: "Onboard Camera: Lap Rekor Sirkuit oleh Bintang N.", tag: "Onboard", img: "1625930601622-031b9099d4f6" },
-                { title: "Keseruan Paddock & Persiapan Rider Sebelum Start", tag: "Behind The Scene", img: "1625930641163-6c1734ecbd65" }
-              ].map((vid, idx) => (
-                <div key={idx} className="group cursor-pointer flex gap-4 bg-zinc-900/50 hover:bg-zinc-800 p-3 rounded-xl border border-zinc-800/50 transition-colors">
-                  <div className="relative w-40 aspect-video rounded-lg overflow-hidden shrink-0 bg-black">
-                    <Image 
-                      src={`https://images.unsplash.com/photo-${vid.img}?q=80&w=400&auto=format&fit=crop`}
-                      alt={vid.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                      <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center pl-0.5 group-hover:bg-anova-red transition-colors">
-                        <Play className="text-white" size={16} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col justify-center py-1">
-                    <span className="text-anova-red text-[10px] font-bold uppercase tracking-wider mb-1">{vid.tag}</span>
-                    <h5 className="font-bold text-zinc-200 group-hover:text-white line-clamp-2 leading-snug text-sm">{vid.title}</h5>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <h4 className="text-center text-sm font-bold text-zinc-400 uppercase tracking-widest mb-10">Official Partners</h4>
         </div>
-      </section>
 
-      {/* 8. News & Updates */}
-      <section id="news" className="w-full bg-black/50 border-t border-zinc-900 overflow-hidden relative py-20">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h3 className="text-3xl font-bold text-white mb-12 flex items-center gap-3">
-            News & Updates
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { title: "Panduan Scrutineering untuk Pemula di Kelas Drag 201m", date: "Maret 12, 2026" },
-              { title: "Update Regulasi Ban untuk Motoprix Musim 2026", date: "Maret 05, 2026" },
-              { title: "Highlight Event Anova Motorsport Bulan Lalu", date: "Februari 28, 2026" },
-            ].map((news, idx) => (
-              <div key={idx} className="group cursor-pointer">
-                <div className="aspect-[4/3] bg-zinc-800 rounded-lg overflow-hidden mb-4 relative">
-                  <Image 
-                    src={`https://images.unsplash.com/photo-${['1625930617993-481e41cc7fda','1625930601622-031b9099d4f6','1625930641163-6c1734ecbd65'][idx]}?q=80&w=600&auto=format&fit=crop`}
-                    alt={news.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="text-anova-red text-xs font-bold uppercase tracking-wider mb-2">{news.date}</div>
-                <h4 className="text-lg font-bold text-white group-hover:text-anova-red transition-colors leading-tight">
-                  {news.title}
-                </h4>
+        <div className="relative w-full flex overflow-hidden">
+          {/* Fading Edges */}
+          <div className="absolute top-0 bottom-0 left-0 w-12 md:w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 right-0 w-12 md:w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+          {/* Marquee Loop Wrapper */}
+          <div className="flex flex-nowrap transition-all duration-500">
+            {/* Duplikasi (banyak array) DIBUTUHKAN murni karena batasan CSS/HTML. 
+                Tanpa duplikat, elemen akan menghilang di kiri dan ada ruang kosong sebelum muncul lagi di kanan.
+                Terutama di layar lebar (desktop), butuh lebih dari 2 set agar tidak terputus kosong di ujung kanan. */}
+            {[1, 2, 3, 4].map((listIndex) => (
+              <div
+                key={listIndex}
+                className="flex flex-nowrap items-center gap-12 md:gap-24 shrink-0 px-6 md:px-12 animate-marquee"
+                aria-hidden={listIndex > 1 ? "true" : "false"}
+              >
+                <Image src="/logo-kny-sponsor.png" alt="KNY Sponsor" width={100} height={40} className="h-8 md:h-12 w-auto object-contain shrink-0" />
+                <Image src="https://sumateracupprix.com/wp-content/uploads/2024/05/image-2024-05-31T135844.401.jpg" alt="Sponsor 1" width={100} height={40} className="h-8 md:h-12 w-auto object-contain shrink-0" />
+                <Image src="https://sumateracupprix.com/wp-content/uploads/2024/05/image-2024-05-31T140333.818.jpg" alt="Sponsor 2" width={100} height={40} className="h-8 md:h-12 w-auto object-contain shrink-0" />
+                <Image src="https://sumateracupprix.com/wp-content/uploads/2024/05/image-2024-05-31T140310.536.jpg" alt="Sponsor 3" width={100} height={40} className="h-8 md:h-12 w-auto object-contain shrink-0" />
+                <Image src="https://sumateracupprix.com/wp-content/uploads/2024/05/image-2024-05-31T140050.224.jpg" alt="Sponsor 4" width={100} height={40} className="h-8 md:h-12 w-auto object-contain shrink-0" />
+                <Image src="https://sumateracupprix.com/wp-content/uploads/2024/05/image-2024-05-31T140239.381.jpg" alt="Sponsor 5" width={100} height={40} className="h-8 md:h-12 w-auto object-contain shrink-0" />
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 9. Official Partners */}
-      <section className="w-full bg-white py-12">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h4 className="text-center text-sm font-bold text-zinc-400 uppercase tracking-widest mb-8">Official Partners</h4>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 md:opacity-60 md:grayscale hover:grayscale-0 transition-duration-300 transition-all">
-            <Image src="/logo-kny-sponsor.png" alt="KNY Sponsor" width={100} height={40} className="h-12 w-auto object-contain" />
-            <Image src="https://sumateracupprix.com/wp-content/uploads/2024/05/image-2024-05-31T135844.401.jpg" alt="Sponsor 1" width={100} height={40} className="h-12 w-auto object-contain" />
-            <Image src="https://sumateracupprix.com/wp-content/uploads/2024/05/image-2024-05-31T140333.818.jpg" alt="Sponsor 2" width={100} height={40} className="h-12 w-auto object-contain" />
-            <Image src="https://sumateracupprix.com/wp-content/uploads/2024/05/image-2024-05-31T140310.536.jpg" alt="Sponsor 3" width={100} height={40} className="h-12 w-auto object-contain" />
-            <Image src="https://sumateracupprix.com/wp-content/uploads/2024/05/image-2024-05-31T140050.224.jpg" alt="Sponsor 4" width={100} height={40} className="h-12 w-auto object-contain" />
-            <Image src="https://sumateracupprix.com/wp-content/uploads/2024/05/image-2024-05-31T140239.381.jpg" alt="Sponsor 5" width={100} height={40} className="h-12 w-auto object-contain" />
-          </div>
-        </div>
-      </section>
+      {/* Footer */}
+      <Footer />
 
-      {/* 10. Footer */}
-      <footer className="w-full bg-zinc-950 border-t border-zinc-900 pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-          <div>
-            <Link href="/" className="inline-block mb-6">
-              <Image 
-                src="/anova-motorsport-logo.png"
-                alt="Anova Motorsport Logo"
-                width={200}
-                height={60}
-                className="h-10 md:h-12 w-auto object-contain"
-                priority
-              />
-            </Link>
-            <p className="text-zinc-400 text-sm max-w-sm leading-relaxed mb-6">
-              Penyelenggara event balap resmi di bawah naungan IMI. Kami berdedikasi untuk memajukan olahraga otomotif Indonesia.
-            </p>
-            <div className="flex items-center gap-4 text-zinc-400">
-              <a href="#" className="hover:text-white transition-colors"><Instagram size={20} /></a>
-              <a href="#" className="hover:text-white transition-colors"><Twitter size={20} /></a>
-              <a href="#" className="hover:text-white transition-colors"><Youtube size={20} /></a>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            <div>
-              <h4 className="text-white font-bold mb-4 uppercase tracking-wider text-sm">Sekretariat</h4>
-              <p className="text-zinc-400 text-sm leading-relaxed">
-                Cafe Tuah Sungai Jantan, Jl. A. Yani<br />
-                Bangkinang, Kampar<br />
-                Riau, 28411
-              </p>
-            </div>
-            <div>
-              <h4 className="text-white font-bold mb-4 uppercase tracking-wider text-sm">Contact Person</h4>
-              <p className="text-zinc-400 text-sm leading-relaxed mb-2">
-                <span className="block text-zinc-500 text-xs">Pendaftaran (WA)</span>
-                +62 819-7340-0100
-              </p>
-              <p className="text-zinc-400 text-sm leading-relaxed">
-                <span className="block text-zinc-500 text-xs">Darurat Event</span>
-                +62 812 9988 7766
-              </p>
-            </div>
-          </div>
+      {/* Hero zoom keyframe */}
+      <style>{`
+        @keyframes heroZoom {
+          from { transform: scale(1.05); }
+          to   { transform: scale(1.12); }
+        }
+      `}</style>
         </div>
-        <div className="max-w-7xl mx-auto px-4 md:px-8 pt-8 border-t border-zinc-900 text-center md:text-left flex flex-col md:flex-row items-center justify-between text-zinc-600 text-xs font-medium">
-          <p>© 2026 Anova Motorsport. All rights reserved.</p>
-          <p className="mt-2 md:mt-0">Powered by ANOVA TEKNO DIGITAL</p>
-        </div>
-      </footer>
+      )}
     </div>
   );
 }
