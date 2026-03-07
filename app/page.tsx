@@ -12,6 +12,7 @@ import VideoSection from "@/app/components/VideoSection";
 import NewsSection from "@/app/components/NewsSection";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import { createClient } from "@/lib/supabase/client";
 
 // ── Race Start Intro ─────────────────────────────────────────────
 function RaceIntro({ onDone }: { onDone: () => void }) {
@@ -146,6 +147,19 @@ export default function Home() {
   const [showIntro, setShowIntro] = useState(false);
   const [pageReady, setPageReady] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [settings, setSettings] = useState<any>(null);
+
+  // Fetch settings
+  useEffect(() => {
+    async function loadSettings() {
+      const supabase = createClient();
+      const { data } = await supabase.from('site_settings').select('*').single();
+      if (data) {
+        setSettings(data);
+      }
+    }
+    loadSettings();
+  }, []);
 
   // Countdown timers
   useEffect(() => {
@@ -395,7 +409,14 @@ export default function Home() {
                     ))}
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <button className="flex-1 bg-anova-red hover:bg-anova-red-hover text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-all hover:scale-[1.02] active:scale-95 text-center">Daftar Online</button>
+                    <a 
+                      href={settings?.whatsapp ? `https://wa.me/${settings.whatsapp}` : "#"} 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="flex-1 bg-anova-red hover:bg-anova-red-hover text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-all hover:scale-[1.02] active:scale-95 text-center block"
+                    >
+                      Daftar Online
+                    </a>
                     <button className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-all hover:scale-[1.02] active:scale-95 text-center">Detail &amp; Regulasi</button>
                   </div>
                 </div>
@@ -450,7 +471,14 @@ export default function Home() {
                     ))}
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <button className="flex-1 bg-anova-red hover:bg-anova-red-hover text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-all hover:scale-[1.02] active:scale-95 text-center">Daftar Online</button>
+                    <a 
+                      href={settings?.whatsapp ? `https://wa.me/${settings.whatsapp}` : "#"} 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="flex-1 bg-anova-red hover:bg-anova-red-hover text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-all hover:scale-[1.02] active:scale-95 text-center block"
+                    >
+                      Daftar Online
+                    </a>
                     <button className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded font-bold uppercase tracking-wider text-sm transition-all hover:scale-[1.02] active:scale-95 text-center">Detail &amp; Regulasi</button>
                   </div>
                 </div>

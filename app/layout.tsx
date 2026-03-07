@@ -29,6 +29,11 @@ export const metadata: Metadata = {
     title: "Anova Motorsport",
     description: "Penyelenggara event balap resmi di bawah naungan IMI.",
   },
+  icons: {
+    icon: "/anova-motorsport-logo.png",
+    shortcut: "/anova-motorsport-logo.png",
+    apple: "/anova-motorsport-logo.png",
+  },
 };
 
 export default function RootLayout({

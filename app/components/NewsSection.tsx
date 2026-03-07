@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
-import { DUMMY_NEWS, type NewsItem } from "@/lib/data/news";
+import { createClient } from "@/lib/supabase/client";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("id-ID", {
@@ -58,8 +58,21 @@ function RevealBox({ children, delay = 0, direction = "up" }: { children: React.
 }
 
 export default function NewsSection() {
-  // Hanya ambil 3 berita terbaru untuk homepage
-  const recentNews = DUMMY_NEWS.slice(0, 3);
+  const [recentNews, setRecentNews] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("news")
+        .select("*")
+        .order("published_at", { ascending: false })
+        .limit(3);
+      
+      if (data) setRecentNews(data);
+    };
+    fetchNews();
+  }, []);
 
   return (
     <section id="news" className="w-full bg-black/50 border-t border-zinc-900 overflow-hidden relative py-20">
@@ -84,7 +97,7 @@ export default function NewsSection() {
               >
                 <div className="aspect-[4/3] bg-black rounded-lg overflow-hidden mb-4 relative">
                   <Image
-                    src={news.imageUrl}
+                    src={news.image_url || "https://images.unsplash.com/photo-1625930617993-481e41cc7fda?q=80&w=1200&auto=format&fit=crop"}
                     alt={news.title}
                     fill
                     className="object-cover transition-transform duration-700 scale-[1.01] group-hover:scale-105"
@@ -94,12 +107,12 @@ export default function NewsSection() {
                   
                   {/* Category Badge */}
                   <div className="absolute top-3 right-3 bg-[#D32F2F] text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest z-10 shadow-lg">
-                    {news.category}
+                    {news.category || "Berita"}
                   </div>
                 </div>
                 
                 <div className="text-anova-red text-xs font-bold uppercase tracking-wider mb-2">
-                  {formatDate(news.publishedAt)}
+                  {formatDate(news.published_at)}
                 </div>
                 
                 <h4 className="text-lg font-bold text-white group-hover:text-anova-red transition-colors leading-tight line-clamp-2">

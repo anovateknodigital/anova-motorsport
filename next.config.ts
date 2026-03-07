@@ -43,6 +43,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.grid.id", // YouTube thumbnails (fallback)
       },
+      {
+        protocol: "https",
+        hostname: "ewsppgezljiujglqjqqz.supabase.co", // YouTube thumbnails (fallback)
+      },
     ],
   },
 };

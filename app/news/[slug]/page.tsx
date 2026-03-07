@@ -49,10 +49,10 @@ export default async function NewsDetail({ params }: { params: Promise<{ slug: s
         
         <div className="flex items-center gap-3 mb-4">
           <span className="bg-[#D32F2F] text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest shadow-lg">
-            {news.category}
+            {news.category || "Berita"}
           </span>
           <div className="flex items-center gap-1.5 text-zinc-400 text-xs font-medium tracking-wide">
-            <Calendar size={14} /> {formatDate(news.publishedAt)}
+            <Calendar size={14} /> {formatDate(news.published_at)}
           </div>
         </div>
 
@@ -62,12 +62,12 @@ export default async function NewsDetail({ params }: { params: Promise<{ slug: s
 
         <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-400 border-b border-zinc-800 pb-6 mb-8">
           <div className="flex items-center gap-2"><User size={16} className="text-[#D32F2F]" /> Ditulis oleh <strong className="text-white">{news.author}</strong></div>
-          <div className="flex items-center gap-2"><Clock size={16} className="text-[#D32F2F]" /> Waktu baca: <strong className="text-white">{news.readTime}</strong></div>
+          <div className="flex items-center gap-2"><Clock size={16} className="text-[#D32F2F]" /> Waktu baca: <strong className="text-white">{news.read_time}</strong></div>
         </div>
 
         <div className="relative w-full aspect-video rounded-2xl overflow-hidden mb-12 border border-zinc-800 bg-zinc-900 shadow-2xl">
           <Image
-            src={news.imageUrl}
+            src={news.image_url || "https://images.unsplash.com/photo-1625930617993-481e41cc7fda?q=80&w=1200&auto=format&fit=crop"}
             alt={news.title}
             fill
             className="object-cover"
@@ -95,7 +95,7 @@ export default async function NewsDetail({ params }: { params: Promise<{ slug: s
           <Tag size={18} className="text-zinc-500" />
           <span className="text-sm font-medium text-zinc-400">Tag:</span>
           <span className="px-3 py-1 bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs rounded-full cursor-pointer hover:bg-zinc-800 transition-colors">
-            {news.category}
+            {news.category || "Berita"}
           </span>
           <span className="px-3 py-1 bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs rounded-full cursor-pointer hover:bg-zinc-800 transition-colors">
             Anova Motorsport
@@ -115,12 +115,12 @@ export default async function NewsDetail({ params }: { params: Promise<{ slug: s
                 className="group flex flex-col bg-zinc-900/40 hover:bg-zinc-800 border border-zinc-800 rounded-xl overflow-hidden transition-all hover:-translate-y-1 hover:border-zinc-600"
               >
                 <div className="relative aspect-video overflow-hidden bg-black">
-                  <Image src={rel.imageUrl} alt={rel.title} fill className="object-cover transition-transform duration-500 scale-[1.01] group-hover:scale-105" style={{ transform: "translateZ(0) scale(1.01)" }} />
+                  <Image src={rel.image_url || "https://images.unsplash.com/photo-1625930617993-481e41cc7fda?q=80&w=1200&auto=format&fit=crop"} alt={rel.title} fill className="object-cover transition-transform duration-500 scale-[1.01] group-hover:scale-105" style={{ transform: "translateZ(0) scale(1.01)" }} />
                 </div>
                 <div className="p-5">
-                  <div className="text-[#D32F2F] text-[10px] font-bold uppercase tracking-widest mb-2">{rel.category}</div>
+                  <div className="text-[#D32F2F] text-[10px] font-bold uppercase tracking-widest mb-2">{rel.category || "Berita"}</div>
                   <h4 className="text-white font-bold mb-2 group-hover:text-[#D32F2F] transition-colors line-clamp-2">{rel.title}</h4>
-                  <div className="text-zinc-500 text-xs">{formatDate(rel.publishedAt)}</div>
+                  <div className="text-zinc-500 text-xs">{formatDate(rel.published_at)}</div>
                 </div>
               </Link>
             ))}

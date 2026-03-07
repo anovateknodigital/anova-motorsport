@@ -71,11 +71,6 @@ export default function Header() {
           <Link href="/events" className="bg-anova-red hover:bg-anova-red-hover text-white px-6 py-2.5 rounded font-bold uppercase tracking-wide text-sm transition-all hover:scale-105 active:scale-95">
             Daftar Event Sekarang
           </Link>
-          <div className="flex items-center gap-4 text-zinc-600">
-            <Link href="#" className="hover:text-anova-red transition-colors hover:scale-110 inline-block"><Instagram size={18} /></Link>
-            <Link href="#" className="hover:text-anova-red transition-colors hover:scale-110 inline-block"><Twitter size={18} /></Link>
-            <Link href="#" className="hover:text-anova-red transition-colors hover:scale-110 inline-block"><Youtube size={18} /></Link>
-          </div>
         </div>
 
         <button
@@ -112,11 +107,6 @@ export default function Header() {
             >
               Daftar Event Sekarang
             </Link>
-            <div className="flex items-center justify-center gap-8 text-zinc-600">
-              <Link href="#" className="hover:text-anova-red transition-colors"><Instagram size={24} /></Link>
-              <Link href="#" className="hover:text-anova-red transition-colors"><Twitter size={24} /></Link>
-              <Link href="#" className="hover:text-anova-red transition-colors"><Youtube size={24} /></Link>
-            </div>
           </div>
         </div>
       )}

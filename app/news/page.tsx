@@ -49,7 +49,7 @@ export default async function NewsList() {
               {/* Thumbnail */}
               <div className="relative aspect-[16/10] overflow-hidden bg-black">
                 <Image
-                  src={news.imageUrl}
+                  src={news.image_url || "https://images.unsplash.com/photo-1625930617993-481e41cc7fda?q=80&w=1200&auto=format&fit=crop"}
                   alt={news.title}
                   fill
                   className="object-cover transition-transform duration-700 scale-[1.01] group-hover:scale-105"
@@ -57,16 +57,16 @@ export default async function NewsList() {
                 />
                 {/* <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" /> */}
                 <div className="absolute top-4 right-4 bg-[#D32F2F] text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest z-10 shadow-lg">
-                  {news.category}
+                  {news.category || "Berita"}
                 </div>
               </div>
 
               {/* Content */}
               <div className="p-6 flex flex-col flex-grow">
                 <div className="flex items-center gap-3 text-xs text-zinc-400 mb-3 font-medium uppercase tracking-wide">
-                  <div className="flex items-center gap-1.5"><Calendar size={14} className="text-[#D32F2F]" />{formatDate(news.publishedAt)}</div>
+                  <div className="flex items-center gap-1.5"><Calendar size={14} className="text-[#D32F2F]" />{formatDate(news.published_at)}</div>
                   <span>•</span>
-                  <span>{news.readTime}</span>
+                  <span>{news.read_time}</span>
                 </div>
                 
                 <h2 className="text-xl font-bold text-white mb-3 leading-snug group-hover:text-[#D32F2F] transition-colors line-clamp-2">
