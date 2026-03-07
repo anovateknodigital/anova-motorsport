@@ -11,6 +11,7 @@ export interface EventItem {
     imageUrl: string;
     status: "upcoming" | "past";
     registrationUrl?: string;
+    overlayImage?: string;
 }
 
 export const DUMMY_EVENTS: EventItem[] = [
@@ -26,7 +27,8 @@ export const DUMMY_EVENTS: EventItem[] = [
         description: "Kejuaraan Nasional Motoprix wilayah Sumatera yang diselenggarakan dengan standar tertinggi. Menampilkan pembalap terbaik dari seluruh region Sumatera dalam memperebutkan poin krusial untuk juara nasional. Kelas pendukung termasuk Matic, Underbone 2T, dan Sport.",
         imageUrl: "https://d34vm3j4h7f97z.cloudfront.net/original/4X/8/7/9/8798a3766550f77660de63c571a51c829cbefd5c.jpeg",
         status: "upcoming",
-        registrationUrl: "#"
+        registrationUrl: "#",
+        overlayImage: "/bangkinang-sirkuit.png"
     },
     {
         id: "2",

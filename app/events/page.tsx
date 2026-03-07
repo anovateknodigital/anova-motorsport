@@ -73,7 +73,19 @@ export default async function EventsPage() {
                       className="object-cover transition-transform duration-700 scale-[1.01] group-hover:scale-105"
                       style={{ transform: "translateZ(0) scale(1.01)" }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:opacity-80 transition-opacity duration-300" />
+                    
+                    {evt.overlayImage && (
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 z-20 pointer-events-none opacity-60 group-hover:opacity-90 group-hover:scale-110 transition-all duration-500">
+                        <Image
+                          src={evt.overlayImage}
+                          alt="Sirkuit Overlay"
+                          fill
+                          className="object-contain brightness-0 invert"
+                        />
+                      </div>
+                    )}
+                    
                     <div className="absolute top-4 left-4 bg-[#D32F2F] text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest z-10 shadow-lg">
                       {evt.category}
                     </div>

@@ -25,8 +25,8 @@ export default function Header() {
     { name: "Home", href: "/" },
     { name: "Tentang Kami", href: "/about" },
     { name: "Events", href: "/events" },
-    { name: "Race Results", href: "/#results" },
-    { name: "Gallery", href: "/#gallery" },
+    { name: "Race Results", href: "/results" },
+    { name: "Gallery", href: "/gallery" },
     { name: "News", href: "/news" },
   ];
 

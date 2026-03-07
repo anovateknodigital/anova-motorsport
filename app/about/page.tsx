@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mail, Trophy, Flag, Users } from "lucide-react";
+import { Mail, Trophy, Flag, Users, IdCard } from "lucide-react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
@@ -64,6 +64,24 @@ export default function About() {
                   RAMLI ANOVA
                 </h2>
                 <h3 className="text-xl text-zinc-400 font-medium uppercase tracking-widest mt-2">Founder Anova Motorsport</h3>
+              </div>
+
+              {/* KTA IMI Badge - Tampil Global di Mobile & Desktop */}
+              <div className="flex items-center gap-4 bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-2xl hover:border-anova-red/50 transition-all hover:scale-[1.02] w-full md:max-w-max relative overflow-hidden group">
+                {/* Glow Effect */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-anova-red/10 rounded-full blur-2xl group-hover:bg-anova-red/20 transition-colors pointer-events-none" />
+                
+                <div className="w-14 h-14 bg-black border border-anova-red/30 flex items-center justify-center text-anova-red rounded-lg shrink-0 relative z-10 shadow-[0_0_15px_rgba(211,47,47,0.15)]">
+                  <IdCard size={28} />
+                </div>
+                
+                <div className="relative z-10 flex flex-col pr-4">
+                  <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Ikatan Motor Indonesia</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-lg text-zinc-300 font-medium">No. KTA:</span>
+                    <span className="font-mono text-2xl font-bold text-white tracking-widest group-hover:text-anova-red transition-colors">1111585193</span>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-6 text-zinc-300 leading-relaxed text-lg">

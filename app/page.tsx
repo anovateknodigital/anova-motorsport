@@ -358,15 +358,18 @@ export default function Home() {
                 data-reveal
                 className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden backdrop-blur-sm shadow-xl hover:border-[#D32F2F]/30 transition-all duration-300 hover:shadow-[0_0_30px_rgba(211,47,47,0.08)]"
               >
-                <div className="relative h-60 w-full group">
-                  <Image
-                    src="https://cdn.medcom.id/dynamic/content/2025/07/13/1768639/X7pS9VTW2A.jpg?w=800"
-                    alt="ANOVA DRAG BIKE"
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
-                  <div className="absolute top-4 right-4 bg-anova-red text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider z-10">
+                <div className="relative w-full group">
+                  <div className="relative h-60 w-full bg-black overflow-hidden rounded-t-xl">
+                    <Image
+                      src="https://cdn.medcom.id/dynamic/content/2025/07/13/1768639/X7pS9VTW2A.jpg?w=800"
+                      alt="ANOVA DRAG BIKE"
+                      fill
+                      className="object-cover transition-transform duration-700 scale-[1.01] group-hover:scale-105"
+                      style={{ transform: "translateZ(0) scale(1.01)" }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:opacity-80 transition-opacity duration-300" />
+                  </div>
+                  <div className="absolute top-4 right-4 bg-anova-red text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider z-10 shadow-lg">
                     Drag Race
                   </div>
                 </div>
@@ -404,23 +407,26 @@ export default function Home() {
                 data-delay="1"
                 className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden backdrop-blur-sm hover:border-[#D32F2F]/30 transition-all duration-300 hover:shadow-[0_0_30px_rgba(211,47,47,0.08)]"
               >
-                <div className="relative h-60 w-full group mb-5">
-                  <Image
-                    src="https://d34vm3j4h7f97z.cloudfront.net/original/4X/8/7/9/8798a3766550f77660de63c571a51c829cbefd5c.jpeg"
-                    alt="KEJURNAS ANOVA MOTOPRIX"
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
-                  <div className="absolute -bottom-16 right-4 w-48 h-48 z-20 pointer-events-none">
+                <div className="relative w-full group mb-5">
+                  <div className="relative h-60 w-full bg-black overflow-hidden rounded-t-xl">
+                    <Image
+                      src="https://d34vm3j4h7f97z.cloudfront.net/original/4X/8/7/9/8798a3766550f77660de63c571a51c829cbefd5c.jpeg"
+                      alt="KEJURNAS ANOVA MOTOPRIX"
+                      fill
+                      className="object-cover transition-transform duration-700 scale-[1.01] group-hover:scale-105"
+                      style={{ transform: "translateZ(0) scale(1.01)" }}
+                    />
+                    <div className="absolute inset-0 bg-black/50 group-hover:bg-black/20 transition-colors duration-300" />
+                  </div>
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 z-20 pointer-events-none opacity-60 group-hover:opacity-90 group-hover:scale-110 transition-all duration-500">
                     <Image
                       src="/bangkinang-sirkuit.png"
                       alt="Sirkuit Bangkinang"
                       fill
-                      className="object-contain brightness-0 invert opacity-80 group-hover:scale-105 transition-all duration-500"
+                      className="object-contain brightness-0 invert"
                     />
                   </div>
-                  <div className="absolute top-4 right-4 bg-anova-red text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider z-10">Motoprix</div>
+                  <div className="absolute top-4 right-4 bg-anova-red text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider z-10 shadow-lg">Motoprix</div>
                 </div>
 
                 <div className="p-8">
@@ -490,50 +496,68 @@ export default function Home() {
             <h3 data-reveal="right" className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
               Latest Race Results
             </h3>
-            <div data-reveal="scale" className="bg-white rounded-xl overflow-hidden text-zinc-900">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-zinc-100 uppercase text-xs tracking-wider text-zinc-500 font-bold border-b border-zinc-200">
-                    <th className="py-4 px-6">Kelas</th>
-                    <th className="py-4 px-6 text-right">Pemenang / Waktu</th>
-                  </tr>
-                </thead>
-                <tbody className="text-sm font-medium">
-                  <tr className="border-b border-zinc-100 hover:bg-zinc-50 transition-colors">
-                    <td className="py-4 px-6"><div className="font-bold">Motoprix</div><div className="text-xs text-zinc-500 font-normal">Underbone 150cc</div></td>
-                    <td className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end gap-3">
-                        <div className="text-right">
-                          <div className="font-bold">Bintang N.</div>
-                          <div className="text-xs text-zinc-500 font-normal">Anova RT</div>
-                        </div>
-                        <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-zinc-200 shrink-0">
-                          <Image src="https://asset.kompas.com/crops/_WPT6_jc87U-nz1_jNlkjTcx2Dg=/0x0:1599x1066/750x500/data/photo/2024/11/17/673a0716d9b2b.jpeg" alt="Bintang N." fill className="object-cover" />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr className="border-b border-zinc-100 bg-zinc-50/50 hover:bg-zinc-50 transition-colors">
-                    <td className="py-4 px-6"><div className="font-bold">Drag Race</div><div className="text-xs text-zinc-500 font-normal">Bracket 9 Detik</div></td>
-                    <td className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end gap-3">
-                        <div className="text-right">
-                          <div className="font-bold">Reza V.</div>
-                          <div className="text-xs text-anova-red font-bold">09.012s</div>
-                        </div>
-                        <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-zinc-200 shrink-0">
-                          <Image src="https://cdn.grid.id/crop/0x0:0x0/700x465/photo/2020/09/28/4272447586.jpg" alt="Reza V." fill className="object-cover" />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan={2} className="py-4 px-6 text-center">
-                      <Link href="#results" className="text-anova-red hover:underline font-bold text-sm">Lihat Semua Hasil</Link>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div className="flex flex-col gap-5">
+              
+              {/* Card 1: Bintang */}
+              <div data-reveal="scale" className="relative bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 flex items-center justify-between p-6 pr-0 group hover:border-anova-red/50 transition-colors shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-r from-black via-zinc-900 to-transparent z-0" />
+                
+                {/* Info Text */}
+                <div className="relative z-10 flex flex-col w-2/3 pr-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="bg-anova-red text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">P1</span>
+                    <span className="text-zinc-400 text-xs font-bold uppercase tracking-wider">Motoprix • Underbone 150cc</span>
+                  </div>
+                  <h4 className="text-3xl font-teko font-bold uppercase text-white leading-none mb-1 group-hover:text-anova-red transition-colors">Bintang N.</h4>
+                  <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest mb-4">Anova RT MTR</p>
+                  <p className="text-xs text-zinc-400 font-bold font-mono">12:45.012<span className="text-anova-red text-[10px] ml-1">SEC</span></p>
+                </div>
+
+                {/* Big Angled Photo */}
+                <div className="relative z-10 h-32 w-1/3 min-w-[120px] rounded-l-[40px] overflow-hidden -mr-2 bg-black border-l-4 border-anova-red drop-shadow-2xl translate-x-2 group-hover:translate-x-0 transition-transform duration-500">
+                  <Image 
+                    src="https://asset.kompas.com/crops/_WPT6_jc87U-nz1_jNlkjTcx2Dg=/0x0:1599x1066/750x500/data/photo/2024/11/17/673a0716d9b2b.jpeg" 
+                    alt="Bintang N." 
+                    fill 
+                    className="object-cover object-top scale-110 group-hover:scale-125 transition-transform duration-700" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-anova-red/30 to-transparent mix-blend-overlay" />
+                </div>
+              </div>
+
+              {/* Card 2: Reza */}
+              <div data-reveal="scale" data-delay="1" className="relative bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 flex items-center justify-between p-6 pr-0 group hover:border-anova-red/50 transition-colors shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-r from-black via-zinc-900 to-transparent z-0" />
+                
+                {/* Info Text */}
+                <div className="relative z-10 flex flex-col w-2/3 pr-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="bg-[#FFD700] text-black text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">WR</span>
+                    <span className="text-zinc-400 text-xs font-bold uppercase tracking-wider">Drag Race • Bracket 9D</span>
+                  </div>
+                  <h4 className="text-3xl font-teko font-bold uppercase text-white leading-none mb-1 group-hover:text-anova-red transition-colors">Reza V.</h4>
+                  <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest mb-4">Anova Drag TEAM</p>
+                  <p className="text-xs text-zinc-400 font-bold font-mono">09.012<span className="text-anova-red text-[10px] ml-1">SEC</span></p>
+                </div>
+
+                {/* Big Angled Photo */}
+                <div className="relative z-10 h-32 w-1/3 min-w-[120px] rounded-l-[40px] overflow-hidden -mr-2 bg-black border-l-4 border-anova-red drop-shadow-2xl translate-x-2 group-hover:translate-x-0 transition-transform duration-500">
+                  <Image 
+                    src="https://cdn.grid.id/crop/0x0:0x0/700x465/photo/2020/09/28/4272447586.jpg" 
+                    alt="Reza V." 
+                    fill 
+                    className="object-cover object-center scale-110 group-hover:scale-125 transition-transform duration-700" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-anova-red/30 to-transparent mix-blend-overlay" />
+                </div>
+              </div>
+
+              <div data-reveal="left" className="mt-4 text-center">
+                <Link href="/results" className="inline-flex items-center gap-2 bg-white hover:bg-zinc-200 text-black px-6 py-3 rounded-full font-bold uppercase tracking-wider text-xs transition-all hover:scale-105">
+                  Seluruh Hasil Balap
+                </Link>
+              </div>
+
             </div>
           </section>
 
@@ -581,7 +605,7 @@ export default function Home() {
             {[1, 2, 3, 4].map((listIndex) => (
               <div
                 key={listIndex}
-                className="flex flex-nowrap items-center gap-12 md:gap-24 shrink-0 px-6 md:px-12 animate-marquee"
+                className="flex flex-nowrap items-center gap-12 md:gap-24 shrink-0 px-6 md:px-12 custom-marquee"
                 aria-hidden={listIndex > 1 ? "true" : "false"}
               >
                 <Image src="/logo-kny-sponsor.png" alt="KNY Sponsor" width={100} height={40} className="h-8 md:h-12 w-auto object-contain shrink-0" />
