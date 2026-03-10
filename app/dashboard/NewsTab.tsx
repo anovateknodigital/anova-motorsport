@@ -18,6 +18,8 @@ import {
   Newspaper,
   User,
   Clock,
+  AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 
 function formatDate(iso: string) {
@@ -59,6 +61,19 @@ export function NewsTab() {
   
   const [imageFile, setImageFile] = useState<File | null>(null);
 
+  // Custom Alert Modal State
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalConfig, setModalConfig] = useState<{title: string, message: string, type: "success" | "error" | "info"}>({ 
+    title: "", 
+    message: "", 
+    type: "success" 
+  });
+
+  const showAlert = (title: string, message: string, type: "success" | "error" | "info" = "success") => {
+    setModalConfig({ title, message, type });
+    setModalOpen(true);
+  };
+
   const supabase = createClient();
 
   useEffect(() => {
@@ -83,15 +98,34 @@ export function NewsTab() {
   const handleConfirmDelete = async () => {
     if (showDeleteModal === null) return;
     setSaving(true);
-    const { error } = await supabase.from("news").delete().eq("id", showDeleteModal);
-    if (error) {
-      console.error("Error deleting news:", error);
-      alert("Gagal menghapus berita.");
-    } else {
-      setNews((prev) => prev.filter((n) => n.id !== showDeleteModal));
-      setShowDeleteModal(null);
+    
+    try {
+      const { data: deletedData, error, status } = await supabase
+        .from("news")
+        .delete()
+        .eq("id", showDeleteModal)
+        .select();
+
+      if (error) {
+        console.error("Error deleting news:", error);
+        if (status === 403 || status === 401) {
+          showAlert("Izin Ditolak", "Anda tidak memiliki izin (RLS) untuk menghapus artikel ini.", "error");
+        } else {
+          showAlert("Gagal Menghapus", `Kesalahan: ${error.message}`, "error");
+        }
+      } else if (!deletedData || deletedData.length === 0) {
+        showAlert("Gagal", "Artikel tidak ditemukan atau sudah terhapus. Periksa izin RLS Anda.", "error");
+      } else {
+        setNews((prev) => prev.filter((n) => n.id !== showDeleteModal));
+        setShowDeleteModal(null);
+        showAlert("Terhapus", "Berita berhasil dihapus secara permanen.", "success");
+      }
+    } catch (err: any) {
+      console.error("Unexpected error:", err);
+      showAlert("Kesalahan Sistem", err.message || "Terjadi kesalahan saat menghapus.", "error");
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
   
   const handleEditClick = (item: any) => {
@@ -176,8 +210,9 @@ export function NewsTab() {
 
     if (error) {
       console.error("Error saving news:", error);
-      alert("Gagal menyimpan berita.");
+      showAlert("Gagal Menyimpan", "Terjadi kesalahan saat menyimpan berita ke database.", "error");
     } else if (data) {
+      showAlert("Berhasil", editNewsId ? "Berita berhasil diperbarui!" : "Berita baru berhasil diterbitkan!", "success");
       if (editNewsId) {
         setNews(prev => prev.map(n => n.id === editNewsId ? data[0] : n));
       } else {
@@ -517,6 +552,33 @@ export function NewsTab() {
                 Hapus
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── CUSTOM ALERT MODAL ── */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl relative animate-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => setModalOpen(false)}
+              className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
+            >
+              <X size={18} />
+            </button>
+            <div className="flex flex-col items-center text-center mt-2 mb-4">
+              {modalConfig.type === "success" && <CheckCircle2 size={48} className="text-emerald-500 mb-4" />}
+              {modalConfig.type === "error" && <AlertCircle size={48} className="text-[#D32F2F] mb-4" />}
+              {modalConfig.type === "info" && <AlertCircle size={48} className="text-blue-500 mb-4" />}
+              <h3 className="text-xl font-bold text-white mb-2">{modalConfig.title}</h3>
+              <p className="text-sm text-zinc-400">{modalConfig.message}</p>
+            </div>
+            <button 
+              onClick={() => setModalOpen(false)}
+              className="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-semibold py-2.5 rounded-xl transition-all active:scale-95"
+            >
+              Tutup
+            </button>
           </div>
         </div>
       )}

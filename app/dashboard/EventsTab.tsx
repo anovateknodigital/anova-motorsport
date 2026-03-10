@@ -18,6 +18,8 @@ import {
   X,
   Save,
   FileText,
+  AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 
 function formatDate(iso: string) {
@@ -62,6 +64,19 @@ export function EventsTab() {
   const [overlayImageFile, setOverlayImageFile] = useState<File | null>(null);
   const [regulationFile, setRegulationFile] = useState<File | null>(null);
 
+  // Custom Alert Modal State
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalConfig, setModalConfig] = useState<{title: string, message: string, type: "success" | "error" | "info"}>({ 
+    title: "", 
+    message: "", 
+    type: "success" 
+  });
+
+  const showAlert = (title: string, message: string, type: "success" | "error" | "info" = "success") => {
+    setModalConfig({ title, message, type });
+    setModalOpen(true);
+  };
+
   const supabase = createClient();
 
   useEffect(() => {
@@ -86,15 +101,49 @@ export function EventsTab() {
   const handleConfirmDelete = async () => {
     if (showDeleteModal === null) return;
     setSaving(true);
-    const { error } = await supabase.from("events").delete().eq("id", showDeleteModal);
-    if (error) {
-      console.error("Error deleting event:", error);
-      alert("Gagal menghapus event. Mungkin masih ada pendaftaran yang terkait dengan event ini.");
-    } else {
-      setEvents((prev) => prev.filter((e) => e.id !== showDeleteModal));
-      setShowDeleteModal(null);
+    
+    try {
+      // First, try to check if anything actually exists to delete (optional but good for debugging)
+      const { data: deletedData, error, status } = await supabase
+        .from("events")
+        .delete()
+        .eq("id", showDeleteModal)
+        .select();
+
+      if (error) {
+        console.error("Error deleting event:", error);
+        
+        // Check for common PG error codes
+        if (error.code === '23503') { // Foreign Key Violation
+          showAlert(
+            "Gagal Menghapus", 
+            "Event ini tidak dapat dihapus karena masih ada data Pendaftaran (Registrasi) atau Hasil Balap yang merujuk padanya. Hapus data tersebut terlebih dahulu.", 
+            "error"
+          );
+        } else if (status === 403 || status === 401) {
+          showAlert("Izin Ditolak", "Anda tidak memiliki izin (RLS) untuk menghapus data ini. Hubungi superadmin.", "error");
+        } else {
+          showAlert("Kesalahan Database", `Gagal menghapus: ${error.message}`, "error");
+        }
+      } else if (!deletedData || deletedData.length === 0) {
+        // If error is null but no data returned, it might be RLS or wrong ID
+        showAlert(
+          "Gagal", 
+          "Data tidak terhapus dari server. Ini bisa terjadi jika Anda tidak memiliki izin atau data sudah terhapus oleh admin lain.", 
+          "error"
+        );
+      } else {
+        // Success
+        setEvents((prev) => prev.filter((e) => e.id !== showDeleteModal));
+        setShowDeleteModal(null);
+        showAlert("Terhapus", "Event berhasil dihapus secara permanen.", "success");
+      }
+    } catch (err: any) {
+      console.error("Unexpected error:", err);
+      showAlert("Kesalahan Sistem", err.message || "Terjadi kesalahan yang tidak terduga saat menghapus.", "error");
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
   
   const handleEditClick = (event: any) => {
@@ -190,7 +239,7 @@ export function EventsTab() {
       }
     } catch (err) {
       console.error("Error uploading images:", err);
-      alert("Gagal mengunggah gambar. Pastikan format file sesuai.");
+      showAlert("Gagal Upload", "Gagal mengunggah gambar. Pastikan format file sesuai dan ukuran tidak terlalu besar.", "error");
       setSaving(false);
       return;
     }
@@ -217,8 +266,9 @@ export function EventsTab() {
 
     if (error) {
       console.error("Error saving event:", error);
-      alert("Gagal menyimpan event");
+      showAlert("Gagal Menyimpan", "Terjadi kesalahan saat menyimpan data event ke database.", "error");
     } else if (data) {
+      showAlert("Berhasil", editEventId ? "Perubahan event berhasil disimpan!" : "Event baru berhasil dibuat!", "success");
       if (editEventId) {
         setEvents(prev => prev.map(e => e.id === editEventId ? data[0] : e));
       } else {
@@ -719,6 +769,33 @@ export function EventsTab() {
                 Hapus
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── CUSTOM ALERT MODAL ── */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl relative animate-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => setModalOpen(false)}
+              className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
+            >
+              <X size={18} />
+            </button>
+            <div className="flex flex-col items-center text-center mt-2 mb-4">
+              {modalConfig.type === "success" && <CheckCircle2 size={48} className="text-emerald-500 mb-4" />}
+              {modalConfig.type === "error" && <AlertCircle size={48} className="text-[#D32F2F] mb-4" />}
+              {modalConfig.type === "info" && <AlertCircle size={48} className="text-blue-500 mb-4" />}
+              <h3 className="text-xl font-bold text-white mb-2">{modalConfig.title}</h3>
+              <p className="text-sm text-zinc-400">{modalConfig.message}</p>
+            </div>
+            <button 
+              onClick={() => setModalOpen(false)}
+              className="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-semibold py-2.5 rounded-xl transition-all active:scale-95"
+            >
+              Tutup
+            </button>
           </div>
         </div>
       )}
