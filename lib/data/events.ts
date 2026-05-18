@@ -1,3 +1,5 @@
+import { createClient } from "@/lib/supabase/server";
+
 export interface EventItem {
     id: string;
     slug: string;
@@ -12,71 +14,84 @@ export interface EventItem {
     status: "upcoming" | "past";
     registrationUrl?: string;
     overlayImage?: string;
+    regulationFileUrl?: string;
 }
 
-export const DUMMY_EVENTS: EventItem[] = [
-    {
-        id: "1",
-        slug: "anova-motoprix-kejurnas-2026",
-        title: "KEJURNAS ANOVA MOTOPRIX",
-        category: "Motoprix",
-        startDate: "2026-05-30T08:00:00Z",
-        endDate: "2026-05-31T17:00:00Z",
-        timeInfo: "08:00 - 17:00 WIB",
-        location: "Sirkuit Permanent Sport Centre Bangkinang, Kampar",
-        description: "Kejuaraan Nasional Motoprix wilayah Sumatera yang diselenggarakan dengan standar tertinggi. Menampilkan pembalap terbaik dari seluruh region Sumatera dalam memperebutkan poin krusial untuk juara nasional. Kelas pendukung termasuk Matic, Underbone 2T, dan Sport.",
-        imageUrl: "https://d34vm3j4h7f97z.cloudfront.net/original/4X/8/7/9/8798a3766550f77660de63c571a51c829cbefd5c.jpeg",
-        status: "upcoming",
-        registrationUrl: "#",
-        overlayImage: "/bangkinang-sirkuit.png"
-    },
-    {
-        id: "2",
-        slug: "anova-drag-bike-championship-2026",
-        title: "ANOVA DRAG BIKE CHAMPIONSHIP",
-        category: "Drag Race",
-        startDate: "2026-04-15T15:00:00Z",
-        endDate: "2026-04-16T22:00:00Z",
-        timeInfo: "15:00 - 22:00 WIB (Night Race)",
-        location: "Sirkuit Non Permanen, Lanud Roesmin Nurjadin",
-        description: "Ajang adu 201 meter paling bergengsi tahun ini! Didominasi oleh format Night Race dengan lintasan berpengamanan tinggi dan sistem timing kelas dunia. Berhadiah total ratusan juta rupiah untuk lebih dari 15 kelas perlombaan.",
-        imageUrl: "https://cdn.medcom.id/dynamic/content/2025/07/13/1768639/X7pS9VTW2A.jpg?w=800",
-        status: "upcoming",
-        registrationUrl: "#"
-    },
-    {
-        id: "3",
-        slug: "sumatera-road-race-open-2025",
-        title: "SUMATERA ROAD RACE OPEN",
-        category: "Motoprix",
-        startDate: "2025-11-20T08:00:00Z",
-        endDate: "2025-11-21T18:00:00Z",
-        timeInfo: "08:00 - 18:00 WIB",
-        location: "Sirkuit Permanent Sport Centre Bangkinang, Kampar",
-        description: "Event penutup tahun 2025 yang sukses dihadiri 12.000 penonton. Memperebutkan Piala Bergilir Bupati Kampar dan memecahkan 3 rekor putaran tercepat di sirkuit.",
-        imageUrl: "https://images.unsplash.com/photo-1625930601622-031b9099d4f6?q=80&w=1200",
-        status: "past"
-    },
-    {
-        id: "4",
-        slug: "anova-sunday-drag-battle-2025",
-        title: "ANOVA SUNDAY DRAG BATTLE",
-        category: "Drag Race",
-        startDate: "2025-08-10T09:00:00Z",
-        endDate: "2025-08-10T17:00:00Z",
-        timeInfo: "09:00 - 17:00 WIB",
-        location: "Sirkuit Non Permanen, Lanud Roesmin Nurjadin",
-        description: "Pertarungan motor-motor tercepat di aspal Lanud. Mencatatkan rekor waktu 6.8 detik di kelas FFA Campuran 250cc.",
-        imageUrl: "https://images.unsplash.com/photo-1613246273006-7f7476e693d9?q=80&w=1200",
-        status: "past"
+// Map snake_case DB row to camelCase EventItem
+function mapRow(row: Record<string, unknown>): EventItem {
+    return {
+        id: String(row.id),
+        slug: (row.slug as string) ?? String(row.id),
+        title: (row.title as string) ?? "",
+        category: (row.category as string) ?? "",
+        startDate: (row.start_date as string) ?? "",
+        endDate: (row.end_date as string) ?? "",
+        timeInfo: (row.time_info as string) ?? "",
+        location: (row.location as string) ?? "",
+        description: (row.description as string) ?? "",
+        imageUrl: (row.image_url as string) ?? "",
+        status: ((row.status as string) === "past" ? "past" : "upcoming") as "upcoming" | "past",
+        registrationUrl: (row.registration_url as string | null) ?? undefined,
+        overlayImage: (row.overlay_image as string | null) ?? undefined,
+        regulationFileUrl: (row.regulation_file_url as string | null) ?? undefined,
+    };
+}
+
+export async function getEventsList(): Promise<EventItem[]> {
+    try {
+        const supabase = await createClient();
+        const { data, error } = await supabase
+            .from("events")
+            .select("*")
+            .order("start_date", { ascending: true });
+
+        if (error) {
+            console.error("[getEventsList] Supabase error:", error.message);
+            return [];
+        }
+
+        return (data ?? []).map((row) => mapRow(row as Record<string, unknown>));
+    } catch (err) {
+        console.error("[getEventsList] Unexpected error:", err);
+        return [];
     }
-];
-
-export async function getEventsList() {
-    // Return all events sorted by start date (newest first for layout, but for upcoming we want closest first)
-    return [...DUMMY_EVENTS];
 }
 
-export async function getEventBySlug(slug: string) {
-    return DUMMY_EVENTS.find(e => e.slug === slug);
+export async function getEventBySlug(slug: string): Promise<EventItem | null> {
+    try {
+        const supabase = await createClient();
+        const { data, error } = await supabase
+            .from("events")
+            .select("*")
+            .eq("slug", slug)
+            .single();
+
+        if (error || !data) return null;
+        return mapRow(data as Record<string, unknown>);
+    } catch (err) {
+        console.error("[getEventBySlug] Unexpected error:", err);
+        return null;
+    }
+}
+
+export async function getUpcomingEvents(limit = 2): Promise<EventItem[]> {
+    try {
+        const supabase = await createClient();
+        const { data, error } = await supabase
+            .from("events")
+            .select("*")
+            .eq("status", "upcoming")
+            .order("start_date", { ascending: true })
+            .limit(limit);
+
+        if (error) {
+            console.error("[getUpcomingEvents] Supabase error:", error.message);
+            return [];
+        }
+
+        return (data ?? []).map((row) => mapRow(row as Record<string, unknown>));
+    } catch (err) {
+        console.error("[getUpcomingEvents] Unexpected error:", err);
+        return [];
+    }
 }

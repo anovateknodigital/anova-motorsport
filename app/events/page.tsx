@@ -113,10 +113,13 @@ export default async function EventsPage() {
                     </div>
                     
                     <div className="mt-auto flex flex-wrap gap-3">
-                      <button className="flex-1 min-w-[120px] bg-anova-red hover:bg-anova-red-hover text-white py-2.5 px-4 rounded font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2">
+                      <Link
+                        href={`/register?event=${evt.slug}`}
+                        className="flex-1 min-w-[120px] bg-anova-red hover:bg-anova-red-hover text-white py-2.5 px-4 rounded font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2"
+                      >
                         Daftar
                         <ChevronRight size={14} />
-                      </button>
+                      </Link>
                       <button className="flex-1 min-w-[120px] bg-zinc-800 hover:bg-zinc-700 text-white py-2.5 px-4 rounded font-bold uppercase tracking-wider text-xs transition-colors border border-zinc-700">
                         Regulasi
                       </button>

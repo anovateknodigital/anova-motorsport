@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__deploy_edge_function",
+      "Bash(mkdir *)",
+      "Bash(npm run *)",
+      "Bash(findstr *)",
+      "Bash(npx *)",
+      "Bash(timeout *)",
+      "Bash(tasklist)",
+      "Bash(taskkill *)",
+      "Bash(type *)",
+      "Bash(rmdir *)"
+    ]
+  },
+  "$version": 3
+}

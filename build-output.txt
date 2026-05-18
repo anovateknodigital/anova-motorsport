@@ -1,0 +1,31 @@
+
+> anova-motorsport@0.1.0 build
+> next build
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 5.5s
+  Running TypeScript ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/26) ...
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+  Generating static pages using 11 workers (6/26) 
+  Generating static pages using 11 workers (12/26) 
+  Generating static pages using 11 workers (19/26) 
+⨯ useSearchParams() should be wrapped in a suspense boundary at page "/register/rider/new". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at Q (C:\projects\anova-motorsport\.next\server\chunks\ssr\node_modules_next_920e7746._.js:2:2111)
+    at o (C:\projects\anova-motorsport\.next\server\chunks\ssr\node_modules_next_920e7746._.js:4:5284)
+    at x (C:\projects\anova-motorsport\.next\server\chunks\ssr\app_register_rider_new_page_tsx_60779e15._.js:1:3324)
+    at an (C:\projects\anova-motorsport\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:84360)
+    at ai (C:\projects\anova-motorsport\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:86179)
+    at al (C:\projects\anova-motorsport\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:107953)
+    at as (C:\projects\anova-motorsport\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:105368)
+    at aa (C:\projects\anova-motorsport\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:84712)
+    at ai (C:\projects\anova-motorsport\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:86228)
+    at ai (C:\projects\anova-motorsport\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.prod.js:2:104708)
+Error occurred prerendering page "/register/rider/new". Read more: https://nextjs.org/docs/messages/prerender-error
+Export encountered an error on /register/rider/new/page: /register/rider/new, exiting the build.
+⨯ Next.js build worker exited with code: 1 and signal: null

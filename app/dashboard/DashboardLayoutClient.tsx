@@ -21,6 +21,8 @@ import {
   X,
   ChevronRight,
   AlertTriangle,
+  GraduationCap,
+  Star,
 } from "lucide-react";
 
 interface DashboardLayoutClientProps {
@@ -31,9 +33,11 @@ interface DashboardLayoutClientProps {
 const navItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
   { icon: Calendar, label: "Events", href: "/dashboard/events" },
+  { icon: GraduationCap, label: "Manajemen Kelas", href: "/dashboard/classes" },
   { icon: Users, label: "Peserta", href: "/dashboard/participants" },
   { icon: Trophy, label: "Race Results", href: "/dashboard/results" },
   { icon: Newspaper, label: "News & Updates", href: "/dashboard/news" },
+  { icon: Star, label: "Sponsors", href: "/dashboard/sponsors" },
   { icon: BarChart3, label: "Statistik", href: "/dashboard/stats" },
 ];
 

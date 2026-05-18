@@ -39,6 +39,10 @@ export async function updateSession(request: NextRequest) {
 
     // Protected routes — only /dashboard (and sub-paths) require authentication
     const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard')
+    
+    // Register routes that require manager authentication
+    const isRegisterProtectedRoute = request.nextUrl.pathname.startsWith('/register/dashboard') || 
+                                      request.nextUrl.pathname.startsWith('/register/rider')
 
     if (!user && isProtectedRoute) {
         // no user, redirect to login page
@@ -47,10 +51,24 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
+    // Redirect unauthenticated users trying to access register protected routes to /register
+    if (!user && isRegisterProtectedRoute) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/register'
+        return NextResponse.redirect(url)
+    }
+
     // If user is already logged in and visits /login, redirect to dashboard
     if (user && request.nextUrl.pathname.startsWith('/login')) {
         const url = request.nextUrl.clone()
         url.pathname = '/dashboard'
+        return NextResponse.redirect(url)
+    }
+
+    // If manager is logged in and visits /register, redirect to dashboard
+    if (user && request.nextUrl.pathname === '/register') {
+        const url = request.nextUrl.clone()
+        url.pathname = '/register/dashboard'
         return NextResponse.redirect(url)
     }
 
